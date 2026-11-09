@@ -1,3 +1,17 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+/build
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
 # macOS
 .DS_Store
 .AppleDouble
@@ -9,5 +23,6 @@
 *.swp
 *.swo
 
-# Logs
+# Logs & env
 *.log
+.env*.local
