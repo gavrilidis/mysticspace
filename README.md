@@ -8,8 +8,8 @@
 
 ```text
 mysticspace/
-├── .github/workflows/
-│   └── deploy.yml                   # CI/CD пайплайн сборки и деплоя на GitHub Pages
+├── scripts/
+│   └── deploy.mjs                   # Скрипт ручного деплоя статики (out/) в ветку gh-pages
 ├── src/
 │   ├── app/
 │   │   ├── globals.css              # Глобальные стили, CSS-переменные и анимации
@@ -88,3 +88,9 @@ mysticspace/
    ```bash
    npm run build
    ```
+
+4. Ручной деплой на прод (GitHub Pages без GitHub Actions):
+   ```bash
+   npm run deploy
+   ```
+   Команда локально собирает статику в `out/`, добавляет `.nojekyll` и пушит готовый бандл в ветку `gh-pages`.

@@ -1,14 +1,13 @@
 /** @type {import('next').NextConfig} */
-const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+const isGhPagesDeploy = process.env.DEPLOY_GH_PAGES === 'true';
 
 const nextConfig = {
   output: 'export',
-  basePath: isGithubActions ? '/mysticspace' : '',
-  assetPrefix: isGithubActions ? '/mysticspace/' : '',
+  basePath: isGhPagesDeploy ? '/mysticspace' : '',
+  assetPrefix: isGhPagesDeploy ? '/mysticspace/' : '',
   images: {
     unoptimized: true,
   },
 };
 
 export default nextConfig;
-
