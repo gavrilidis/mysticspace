@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>MYSTIC SPACE — Навигационная система твоей судьбы</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Cormorant Garamond (Display), Plus Jakarta Sans / Inter (Clean UI), JetBrains Mono (Accents) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* =====================================================================
+       DYNAMIC MULTI-PALETTE CSS VARIABLES
+       ===================================================================== */
+    :root {
+      --bg-deep: #030408;
+      --accent-1: #E5C158;
+      --accent-1-rgb: 229, 193, 88;
+      --accent-2: #60A5FA;
+      --accent-2-rgb: 96, 165, 250;
+      --accent-soft: #F5E6C8;
+      --card-bg: rgba(9, 12, 22, 0.58);
+      --card-border: rgba(229, 193, 88, 0.22);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      transition: background-color 0.7s ease;
+    }
+
+    ::selection {
+      background: rgba(var(--accent-1-rgb), 0.3);
+      color: #fff;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #030408; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--accent-1-rgb), 0.35);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--accent-1-rgb), 0.65);
+    }
+
+    /* Dynamic Accent Utilities */
+    .text-accent-1 { color: var(--accent-1); transition: color 0.5s ease; }
+    .text-accent-2 { color: var(--accent-2); transition: color 0.5s ease; }
+    .text-accent-soft { color: var(--accent-soft); transition: color 0.5s ease; }
+    .border-accent { border-color: var(--card-border); transition: border-color 0.5s ease; }
+
+    .gradient-headline {
+      background: linear-gradient(135deg, #FFFFFF 0%, var(--accent-soft) 48%, var(--accent-1) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glassmorphic Interactive Cards with Cursor Spotlight & 3D Tilt */
+    .mystic-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-style: preserve-3d;
+    }
+    .mystic-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(var(--accent-1-rgb), 0.13),
+        transparent 45%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .mystic-card:hover::before {
+      opacity: 1;
+    }
+    .mystic-card:hover {
+      border-color: rgba(var(--accent-1-rgb), 0.48);
+      box-shadow: 0 20px 50px -15px rgba(var(--accent-1-rgb), 0.16);
+    }
+
+    /* Primary & Ghost Buttons */
+    .btn-cosmic {
+      background: linear-gradient(135deg, rgba(var(--accent-1-rgb), 0.26) 0%, rgba(var(--accent-2-rgb), 0.16) 100%);
+      border: 1px solid rgba(var(--accent-1-rgb), 0.55);
+      color: #FFFFFF;
+      box-shadow: 0 0 25px rgba(var(--accent-1-rgb), 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-cosmic:hover {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 38px rgba(var(--accent-1-rgb), 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px) scale(1.01);
+    }
+    .btn-cosmic:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .btn-glass {
+      background: rgba(15, 20, 35, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #E2E8F0;
+      transition: all 0.3s ease;
+    }
+    .btn-glass:hover {
+      border-color: rgba(var(--accent-1-rgb), 0.45);
+      color: #FFFFFF;
+      background: rgba(var(--accent-1-rgb), 0.1);
+    }
+
+    /* =====================================================================
+       SCROLL-DRIVEN MORPHING ANIMATIONS
+       ===================================================================== */
+    .scroll-morph {
+      opacity: 0;
+      transform: perspective(1000px) translateY(48px) rotateX(8deg) scale(0.94);
+      filter: blur(8px);
+      transition:
+        opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform, filter;
+    }
+    .scroll-morph.is-visible {
+      opacity: 1;
+      transform: perspective(1000px) translateY(0) rotateX(0deg) scale(1);
+      filter: blur(0px);
+    }
+
+    /* =====================================================================
+       ANIMATED SVG KEYFRAMES & MICRO-INTERACTIONS
+       ===================================================================== */
+    @keyframes svgSpinCW {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes svgSpinCCW {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes svgPulseScale {
+      0%, 100% { transform: scale(0.92); opacity: 0.75; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    @keyframes svgDashFlow {
+      to { stroke-dashoffset: -48; }
+    }
+    @keyframes tarotFanLeft {
+      0%, 100% { transform: rotate(-14deg) translateX(-4px); }
+      50% { transform: rotate(-24deg) translateX(-9px) translateY(-2px); }
+    }
+    @keyframes tarotFanRight {
+      0%, 100% { transform: rotate(14deg) translateX(4px); }
+      50% { transform: rotate(24deg) translateX(9px) translateY(-2px); }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .svg-origin-center {
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+    .anim-spin-cw {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: svgSpinCW 16s linear infinite;
+    }
+    .anim-spin-ccw {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: svgSpinCCW 20s linear infinite;
+    }
+    .anim-spin-fast {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: svgSpinCW 7s linear infinite;
+    }
+    .anim-pulse-node {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: svgPulseScale 3.2s ease-in-out infinite;
+    }
+    .anim-dash-flow {
+      stroke-dasharray: 6 6;
+      animation: svgDashFlow 2.6s linear infinite;
+    }
+    .anim-tarot-left {
+      transform-origin: 50% 85%;
+      animation: tarotFanLeft 4s ease-in-out infinite;
+    }
+    .anim-tarot-right {
+      transform-origin: 50% 85%;
+      animation: tarotFanRight 4s ease-in-out infinite;
+    }
+    .anim-float {
+      animation: floatSlow 4.2s ease-in-out infinite;
+    }
+
+    /* Accelerate card SVG animations on hover or active step */
+    .mystic-card:hover .anim-spin-cw,
+    .eco-step.active-step .anim-spin-cw {
+      animation-duration: 6s;
+    }
+    .mystic-card:hover .anim-spin-ccw,
+    .eco-step.active-step .anim-spin-ccw {
+      animation-duration: 7.5s;
+    }
+    .mystic-card:hover .anim-dash-flow,
+    .eco-step.active-step .anim-dash-flow {
+      animation-duration: 1.1s;
+    }
+
+    /* 3D Tarot Card Flip Container */
+    .tarot-scene {
+      perspective: 1200px;
+    }
+    .tarot-card-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .tarot-card-3d.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .tarot-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 1rem;
+    }
+    .tarot-back {
+      transform: rotateY(0deg);
+    }
+    .tarot-front {
+      transform: rotateY(180deg);
+    }
+
+    /* Pure Space Mode */
+    #ui-layer {
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body.pure-space #ui-layer {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+    }
+    body.pure-space #cosmos-canvas {
+      cursor: grab;
+    }
+    body.pure-space #cosmos-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* Ecosystem Step Active State */
+    .eco-step {
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0.42;
+      transform: scale(0.975);
+    }
+    .eco-step.active-step {
+      opacity: 1;
+      transform: scale(1);
+      border-color: rgba(var(--accent-1-rgb), 0.65);
+      box-shadow: 0 18px 48px -12px rgba(var(--accent-1-rgb), 0.22);
+      background: rgba(14, 19, 34, 0.78);
+    }
+
+    /* Custom Range Slider */
+    input[type="range"].cosmic-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"].cosmic-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-1);
+      box-shadow: 0 0 14px var(--accent-1);
+      cursor: pointer;
+      border: 2px solid #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    input[type="range"].cosmic-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      box-shadow: 0 0 22px var(--accent-1);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative selection:bg-amber-400/30">
+
+  <!-- ===================================================================== -->
+  <!-- 1. 3D GALAXY APPROACH, ORBITAL FLY-AROUND & DEEP SPACE ENGINE         -->
+  <!-- ===================================================================== -->
+  <canvas id="cosmos-canvas" class="fixed inset-0 w-full h-full z-0 block"></canvas>
+
+  <!-- Subtle Radial Framing Vignette -->
+  <div class="fixed inset-0 pointer-events-none z-[1]" style="background: radial-gradient(circle at 50% 45%, transparent 58%, rgba(2, 3, 7, 0.65) 100%);"></div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN UI LAYER                                                         -->
+  <!-- ===================================================================== -->
+  <div id="ui-layer" class="relative z-10 flex flex-col min-h-screen">
+
+    <!-- =================================================================== -->
+    <!-- 2. STICKY GLASS HEADER WITH ANIMATED SVG LOGO & PALETTE SWITCHER    -->
+    <!-- =================================================================== -->
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-[#030408]/65 backdrop-blur-2xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+
+        <!-- Brand Identity with Multi-Ring Animated SVG Astrolabe -->
+        <a href="#" class="flex items-center gap-3 group shrink-0">
+          <div class="w-10 h-10 rounded-full border border-accent flex items-center justify-center relative bg-black/50 group-hover:scale-105 transition-transform">
+            <svg class="w-7 h-7 text-accent-1 overflow-visible" viewBox="0 0 36 36" fill="none">
+              <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="1" stroke-opacity="0.45" stroke-dasharray="3 3" class="anim-spin-cw"/>
+              <g class="anim-spin-ccw">
+                <ellipse cx="18" cy="18" rx="13" ry="5.5" transform="rotate(-30 18 18)" stroke="currentColor" stroke-width="1.2"/>
+                <circle cx="30" cy="14" r="1.6" fill="currentColor"/>
+              </g>
+              <g class="anim-spin-cw">
+                <ellipse cx="18" cy="18" rx="13" ry="5.5" transform="rotate(40 18 18)" stroke="currentColor" stroke-width="1" stroke-opacity="0.65"/>
+              </g>
+              <path d="M18 12 L19.4 16.6 L24 18 L19.4 19.4 L18 24 L16.6 19.4 L12 18 L16.6 16.6 Z" fill="currentColor" class="anim-pulse-node"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-serif text-xl sm:text-2xl tracking-[0.16em] text-white font-semibold block leading-none">MYSTIC SPACE</span>
+            <span class="font-mono text-[9px] tracking-[0.2em] text-accent-1 uppercase block mt-1">Мистический мир Мариам</span>
+          </div>
+        </a>
+
+        <!-- Center Navigation Links -->
+        <nav class="hidden xl:flex items-center gap-7 text-xs font-medium tracking-wider uppercase text-slate-300">
+          <a href="#ecosystem" class="hover:text-white transition-colors">Тайные грани</a>
+          <a href="#interactive-lab" class="hover:text-white transition-colors">Оракул</a>
+          <a href="#express-code" class="hover:text-white transition-colors">Твой Код</a>
+          <a href="#orbits" class="hover:text-white transition-colors">Доступ</a>
+        </nav>
+
+        <!-- Right CTA & Mobile Menu Button -->
+        <div class="flex items-center gap-2.5">
+          <a href="#express-code" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase btn-cosmic">
+            <span>Рассчитать карту</span>
+            <span>→</span>
+          </a>
+
+          <button onclick="toggleMobileNav()" class="xl:hidden p-2.5 rounded-full border border-white/15 text-slate-200 hover:border-white/40 focus:outline-none" aria-label="Меню">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7h16M4 12h16M4 17h11"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <div id="mobile-nav" class="hidden xl:hidden border-t border-white/10 bg-[#04060C]/95 backdrop-blur-2xl px-4 py-5 space-y-5">
+        <nav class="flex flex-col space-y-2.5 text-sm font-medium text-slate-200">
+          <a href="#ecosystem" onclick="toggleMobileNav()" class="py-2 border-b border-white/5 hover:text-accent-1">✦ Пять граней познания</a>
+          <a href="#interactive-lab" onclick="toggleMobileNav()" class="py-2 border-b border-white/5 hover:text-accent-1">✦ Карта дня и Синастрия</a>
+          <a href="#express-code" onclick="toggleMobileNav()" class="py-2 border-b border-white/5 hover:text-accent-1">✦ Расчёт кода судьбы</a>
+          <a href="#orbits" onclick="toggleMobileNav()" class="py-2 hover:text-accent-1">✦ Уровни доступа</a>
+        </nav>
+
+        <a href="#express-code" onclick="toggleMobileNav()" class="w-full py-3 rounded-full text-center block text-xs font-mono uppercase tracking-widest btn-cosmic">
+          Узнать свой код судьбы
+        </a>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- 3. HERO SECTION                                                     -->
+    <!-- =================================================================== -->
+    <section class="relative min-h-[88vh] flex items-center pt-10 pb-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center w-full">
+
+        <!-- Left Column: High-Converting Mystical Copy -->
+        <div class="lg:col-span-7 space-y-6 sm:space-y-7 text-center lg:text-left scroll-morph is-visible">
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-accent bg-white/[0.04] backdrop-blur-md">
+            <svg class="w-4 h-4 text-accent-1 shrink-0" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" class="anim-spin-cw"/>
+              <path d="M12 6 L13.5 10.5 L18 12 L13.5 13.5 L12 18 L10.5 13.5 L6 12 L10.5 10.5 Z" fill="currentColor" class="anim-pulse-node"/>
+            </svg>
+            <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-accent-soft">Эксклюзивное пространство Мариам • Таро • Медитации • Судьба</span>
+          </div>
+
+          <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl xl:text-[5.1rem] leading-[1.03] tracking-tight font-medium">
+            Добро пожаловать <br />
+            <span class="italic gradient-headline font-normal">в мир мистики.</span>
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
+            Здесь соединяются астрологическая интуиция, древние Арканы и глубокий духовный анализ. Прикоснись к тайнам своего пути, которые обычно остаются невидимыми глазу.
+          </p>
+
+          <!-- Primary CTAs -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-4 pt-2">
+            <a href="#express-code" class="px-8 py-4 rounded-full text-xs sm:text-sm font-medium uppercase tracking-widest btn-cosmic flex items-center justify-center gap-3">
+              <span>✦ Рассчитать карту судьбы</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+            <a href="#ecosystem" class="px-7 py-4 rounded-full text-xs sm:text-sm font-medium uppercase tracking-widest btn-glass flex items-center justify-center gap-2.5">
+              <span>✦ Тайные грани</span>
+            </a>
+          </div>
+
+          <!-- Highlights -->
+          <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-300">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-accent-1" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.2" class="anim-dash-flow"/>
+                <circle cx="10" cy="10" r="2.2" fill="currentColor" class="anim-pulse-node"/>
+              </svg>
+              <span><strong class="text-white font-medium">Точный расчёт</strong> • Натальная карта и Матрица Судьбы</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-accent-1" viewBox="0 0 20 20" fill="none">
+                <rect x="4" y="4" width="12" height="12" stroke="currentColor" stroke-width="1.1" class="anim-spin-cw"/>
+                <rect x="4" y="4" width="12" height="12" transform="rotate(45 10 10)" stroke="currentColor" stroke-width="1.1" class="anim-spin-ccw"/>
+              </svg>
+              <span><strong class="text-white font-medium">Тайные знания</strong> • Таро, синастрия и лунные ритмы</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive 3D Celestial Wheel of Secrets -->
+        <div class="lg:col-span-5 flex items-center justify-center scroll-morph is-visible">
+          <div id="hero-orb-wrapper" class="relative w-full max-w-[420px] aspect-square flex items-center justify-center select-none cursor-pointer group" onclick="cycleHeroOrbMode()">
+            <!-- Outer Ambient Aura -->
+            <div class="absolute inset-6 rounded-full blur-3xl opacity-35 transition-all duration-700 group-hover:opacity-55" style="background: radial-gradient(circle, var(--accent-1) 0%, var(--accent-2) 60%, transparent 100%);"></div>
+
+            <!-- Interactive SVG 3D Gyroscope -->
+            <svg id="hero-gyro-svg" viewBox="0 0 500 500" class="w-full h-full overflow-visible transition-transform duration-300 ease-out"></svg>
+
+            <!-- Floating Interactive Badge -->
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 mystic-card rounded-full px-4 py-1.5 text-[11px] font-mono text-accent-soft flex items-center gap-2 shadow-lg whitespace-nowrap">
+              <span class="w-1.5 h-1.5 rounded-full bg-current text-accent-1 animate-ping"></span>
+              <span id="hero-orb-caption">Колесо Судьбы • Поверни и узнай знак</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 4. VIEWPORT-PINNED SCROLLYTELLING ECOSYSTEM WITH STABILIZATION      -->
+    <!-- =================================================================== -->
+    <section id="ecosystem" class="relative w-full">
+      <!-- Tall Scroll Track on Desktop (440vh) so the sticky stage locks and stabilizes -->
+      <div id="features-scroll-track" class="relative w-full lg:h-[440vh]">
+        <!-- Sticky Viewport Stage -->
+        <div class="lg:sticky lg:top-0 lg:h-screen flex flex-col justify-center py-16 lg:py-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
+          <!-- Compact Section Header + Live Scroll Progress Bar -->
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 lg:mb-8 gap-4">
+            <div>
+              <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-accent-1 block mb-1.5">Тайные знания в одном пространстве</span>
+              <h2 class="font-serif text-3xl sm:text-5xl text-white font-normal leading-tight">
+                Пять граней <span class="italic gradient-headline">твоего пути</span>
+              </h2>
+            </div>
+
+            <!-- Scroll Stage Indicator -->
+            <div class="flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-full px-4 py-2 self-start md:self-auto">
+              <span id="scroll-lock-badge" class="font-mono text-[11px] text-accent-soft">Грань 01 из 05</span>
+              <div class="w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div id="ecosystem-scroll-bar" class="h-full bg-gradient-to-r from-amber-300 to-sky-400 transition-all duration-150" style="width: 20%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pinned Split Layout: Left 5 Interactive Animated SVG Cards + Right Morphing Stage -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+
+            <!-- Left Column: 5 Concise Feature Cards with Custom Animated SVGs -->
+            <div class="lg:col-span-6 space-y-3 sm:space-y-3.5">
+
+              <!-- Step 0: Натальная тайна -->
+              <div data-step="0" onclick="scrollToEcoStep(0)" class="eco-step active-step mystic-card rounded-2xl p-4 sm:p-5 cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-white/[0.05] border border-accent flex items-center justify-center shrink-0">
+                    <svg class="w-8 h-8 text-accent-1 overflow-visible" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" class="anim-spin-cw"/>
+                      <polygon points="20,6 32,27 8,27" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.6" class="anim-spin-ccw"/>
+                      <g class="anim-spin-fast">
+                        <circle cx="20" cy="4" r="2.3" fill="currentColor"/>
+                      </g>
+                      <circle cx="20" cy="20" r="3.2" fill="currentColor" class="anim-pulse-node"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h3 class="font-serif text-xl sm:text-2xl text-white leading-none">01. Звёздный код рождения</h3>
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-accent-1">Тайна души</span>
+                    </div>
+                    <p class="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
+                      Отпечаток неба в минуту твоего прихода в мир: скрытая сила, предназначение и истинные желания.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 1: Матрица Судьбы (Animated Sacred Octagram SVG) -->
+              <div data-step="1" onclick="scrollToEcoStep(1)" class="eco-step mystic-card rounded-2xl p-4 sm:p-5 cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-white/[0.05] border border-accent flex items-center justify-center shrink-0">
+                    <svg class="w-8 h-8 text-accent-1 overflow-visible" viewBox="0 0 40 40" fill="none">
+                      <rect x="8" y="8" width="24" height="24" stroke="currentColor" stroke-width="1.3" class="anim-spin-cw"/>
+                      <rect x="8" y="8" width="24" height="24" transform="rotate(45 20 20)" stroke="currentColor" stroke-width="1.3" class="anim-spin-ccw"/>
+                      <line x1="20" y1="3" x2="20" y2="37" stroke="currentColor" stroke-width="0.9" stroke-opacity="0.5" class="anim-dash-flow"/>
+                      <line x1="3" y1="20" x2="37" y2="20" stroke="currentColor" stroke-width="0.9" stroke-opacity="0.5" class="anim-dash-flow"/>
+                      <circle cx="20" cy="20" r="3.5" fill="currentColor" class="anim-pulse-node"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h3 class="font-serif text-xl sm:text-2xl text-white leading-none">02. Матрица Судьбы (22 кода)</h3>
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-accent-1">Арканы</span>
+                    </div>
+                    <p class="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
+                      Геометрия твоих врождённых энергий: что открывает денежный канал, а какие привычки блокируют рост.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Таро и AI-Оракул (Animated Fanning Tarot Cards SVG) -->
+              <div data-step="2" onclick="scrollToEcoStep(2)" class="eco-step mystic-card rounded-2xl p-4 sm:p-5 cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-white/[0.05] border border-accent flex items-center justify-center shrink-0">
+                    <svg class="w-8 h-8 text-accent-1 overflow-visible" viewBox="0 0 40 40" fill="none">
+                      <g class="anim-tarot-left">
+                        <rect x="13" y="7" width="14" height="24" rx="2.5" fill="#090D1A" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.65"/>
+                      </g>
+                      <g class="anim-tarot-right">
+                        <rect x="13" y="7" width="14" height="24" rx="2.5" fill="#090D1A" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.65"/>
+                      </g>
+                      <rect x="13" y="6" width="14" height="25" rx="2.5" fill="#0E1428" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M20 13 L21.4 17.2 L25.5 18.5 L21.4 19.8 L20 24 L18.6 19.8 L14.5 18.5 L18.6 17.2 Z" fill="currentColor" class="anim-pulse-node"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h3 class="font-serif text-xl sm:text-2xl text-white leading-none">03. Интерактивное Таро</h3>
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-accent-1">Синхроничность</span>
+                    </div>
+                    <p class="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
+                      Мгновенные расклады с учётом твоих текущих транзитов: честный взгляд на ситуацию и выбор пути.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Синастрия и Совместимость (Animated Interlocking Binary Orbits SVG) -->
+              <div data-step="3" onclick="scrollToEcoStep(3)" class="eco-step mystic-card rounded-2xl p-4 sm:p-5 cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-white/[0.05] border border-accent flex items-center justify-center shrink-0">
+                    <svg class="w-8 h-8 text-accent-1 overflow-visible" viewBox="0 0 40 40" fill="none">
+                      <g class="anim-spin-cw">
+                        <ellipse cx="16" cy="20" rx="10" ry="6" transform="rotate(-25 16 20)" stroke="currentColor" stroke-width="1.3"/>
+                        <circle cx="25" cy="16" r="2" fill="currentColor"/>
+                      </g>
+                      <g class="anim-spin-ccw">
+                        <ellipse cx="24" cy="20" rx="10" ry="6" transform="rotate(25 24 20)" stroke="currentColor" stroke-width="1.3"/>
+                        <circle cx="15" cy="24" r="2" fill="currentColor"/>
+                      </g>
+                      <circle cx="20" cy="20" r="2.8" fill="#fff" class="anim-pulse-node"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h3 class="font-serif text-xl sm:text-2xl text-white leading-none">04. Синастрия и химия пары</h3>
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-accent-1">Резонанс</span>
+                    </div>
+                    <p class="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
+                      Наложение двух карт: почему вас тянет друг к другу, где точки трения и как выстроить гармонию.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Персональные ритмы дня (Animated Lunar Crescent & Orbiting Satellite SVG) -->
+              <div data-step="4" onclick="scrollToEcoStep(4)" class="eco-step mystic-card rounded-2xl p-4 sm:p-5 cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-white/[0.05] border border-accent flex items-center justify-center shrink-0">
+                    <svg class="w-8 h-8 text-accent-1 overflow-visible" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="1" stroke-opacity="0.4" class="anim-dash-flow"/>
+                      <path d="M22 9 A11 11 0 1 0 31 23 A8.5 8.5 0 1 1 22 9 Z" fill="currentColor" class="anim-pulse-node"/>
+                      <g class="anim-spin-cw">
+                        <circle cx="20" cy="5" r="2" fill="#fff"/>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h3 class="font-serif text-xl sm:text-2xl text-white leading-none">05. Личный навигатор ритмов</h3>
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-accent-1">Прогностика</span>
+                    </div>
+                    <p class="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
+                      Твой персональный прогноз на каждый день: когда действовать смело, а когда беречь ресурс.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column: Stabilized Holographic Morphing Visualizer -->
+            <div class="lg:col-span-6">
+              <div class="mystic-card rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between min-h-[400px] sm:min-h-[490px] border border-accent">
+                <!-- Top Morph Header -->
+                <div class="w-full flex items-center justify-between border-b border-white/10 pb-4">
+                  <div>
+                    <span id="morph-stage-badge" class="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-1 block">ИЗМЕРЕНИЕ 01 // НАТАЛЬНАЯ КАРТА</span>
+                    <h4 id="morph-stage-title" class="font-serif text-xl sm:text-2xl text-white mt-0.5">Космический отпечаток личности</h4>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <button onclick="scrollToEcoStep(0)" class="w-5 h-2.5 rounded-full bg-white transition-all" id="dot-0" aria-label="Этап 1"></button>
+                    <button onclick="scrollToEcoStep(1)" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all" id="dot-1" aria-label="Этап 2"></button>
+                    <button onclick="scrollToEcoStep(2)" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all" id="dot-2" aria-label="Этап 3"></button>
+                    <button onclick="scrollToEcoStep(3)" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all" id="dot-3" aria-label="Этап 4"></button>
+                    <button onclick="scrollToEcoStep(4)" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all" id="dot-4" aria-label="Этап 5"></button>
+                  </div>
+                </div>
+
+                <!-- Central Animated SVG Stage -->
+                <div class="relative w-full max-w-[330px] aspect-square my-auto flex items-center justify-center">
+                  <svg id="morph-visualizer-svg" viewBox="0 0 400 400" class="w-full h-full overflow-visible transition-all duration-700"></svg>
+                </div>
+
+                <!-- Bottom Insight Caption -->
+                <div id="morph-stage-footer" class="w-full text-center pt-4 border-t border-white/10 text-xs sm:text-sm text-slate-300 font-light">
+                  Синхронизация планет, домов и аспектов в единую живую систему.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5. INTERACTIVE MAGIC SHOWCASE (ANIMATED TAROT + SYNASTRY + MOON)    -->
+    <!-- =================================================================== -->
+    <section id="interactive-lab" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-2xl mx-auto mb-14 scroll-morph">
+        <span class="font-mono text-xs uppercase tracking-[0.25em] text-accent-1 block mb-3">Попробуй прямо сейчас</span>
+        <h2 class="font-serif text-4xl sm:text-5xl text-white font-normal">
+          Прикоснись к <span class="italic gradient-headline">живой системе</span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-3 font-light">
+          Нажми на карту Таро, проверь резонанс стихий или покрути фазу Луны — всё работает в реальном времени.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-7 items-stretch">
+
+        <!-- Interactive Card 1: 3D Tarot Card of the Day with Animated Sacred SVG Back & Front -->
+        <div class="mystic-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between scroll-morph">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-accent-soft mb-4">
+              <span>ИНТЕРАКТИВ 01 // АРКАН ДНЯ</span>
+              <button onclick="drawNewTarotCard(event)" class="underline hover:text-white">Перетасовать ↻</button>
+            </div>
+            <h3 class="font-serif text-2xl sm:text-3xl text-white mb-2">Карта твоего состояния</h3>
+            <p class="text-slate-400 text-xs sm:text-sm font-light mb-6">
+              Сфокусируйся на своём вопросе и нажми на карту, чтобы открыть послание.
+            </p>
+          </div>
+
+          <!-- 3D Flip Tarot Card -->
+          <div class="tarot-scene w-48 sm:w-52 h-72 sm:h-80 mx-auto my-2 cursor-pointer" onclick="flipTarotCard()">
+            <div id="tarot-card-inner" class="tarot-card-3d">
+              <!-- Card Back: Full Animated Sacred Geometry SVG -->
+              <div class="tarot-face tarot-back rounded-2xl border border-accent bg-gradient-to-b from-[#0E1324] to-[#050710] p-4 flex flex-col items-center justify-between shadow-2xl">
+                <div class="w-full flex justify-between text-[10px] font-mono text-accent-1 opacity-80">
+                  <span>✦</span><span>MYSTIC TAROT</span><span>✦</span>
+                </div>
+                <div class="relative w-36 h-36 flex items-center justify-center">
+                  <svg viewBox="0 0 140 140" class="w-full h-full text-accent-1 overflow-visible" fill="none">
+                    <circle cx="70" cy="70" r="62" stroke="currentColor" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="4 4" class="anim-spin-cw"/>
+                    <circle cx="70" cy="70" r="50" stroke="currentColor" stroke-width="1" stroke-opacity="0.3"/>
+                    <g class="anim-spin-ccw">
+                      <rect x="34" y="34" width="72" height="72" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.65"/>
+                      <rect x="34" y="34" width="72" height="72" transform="rotate(45 70 70)" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.65"/>
+                    </g>
+                    <g class="anim-spin-cw">
+                      <ellipse cx="70" cy="70" rx="56" ry="20" transform="rotate(-30 70 70)" stroke="currentColor" stroke-width="1" stroke-opacity="0.5"/>
+                      <ellipse cx="70" cy="70" rx="56" ry="20" transform="rotate(30 70 70)" stroke="currentColor" stroke-width="1" stroke-opacity="0.5"/>
+                    </g>
+                    <path d="M70 46 L75 65 L94 70 L75 75 L70 94 L65 75 L46 70 L65 65 Z" fill="currentColor" class="anim-pulse-node"/>
+                  </svg>
+                </div>
+                <div class="text-center">
+                  <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-soft block">Нажми, чтобы открыть</span>
+                </div>
+              </div>
+
+              <!-- Card Front: Bespoke Animated SVG Arcana Illustration -->
+              <div class="tarot-face tarot-front rounded-2xl border border-accent bg-gradient-to-b from-[#13192E] to-[#060913] p-5 flex flex-col items-center justify-between text-center shadow-2xl">
+                <span id="tarot-num" class="font-mono text-xs tracking-widest text-accent-1">XVII • АРКАН</span>
+                <div id="tarot-svg-holder" class="w-28 h-28 my-1 flex items-center justify-center">
+                  <!-- Populated dynamically with animated SVG -->
+                </div>
+                <div>
+                  <h4 id="tarot-title" class="font-serif text-2xl text-white font-semibold">Путеводная Звезда</h4>
+                  <p id="tarot-meaning" class="text-xs text-slate-300 font-light mt-1.5 leading-relaxed">
+                    Ты на верной орбите. Сомнения отступают — доверься своей главной мечте и сделай шаг сегодня.
+                  </p>
+                </div>
+                <span class="text-[10px] font-mono text-slate-400">Нажми для новой карты</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center pt-4">
+            <span id="tarot-status-hint" class="font-mono text-xs text-accent-1">Нажми на карту для переворота</span>
+          </div>
+        </div>
+
+        <!-- Interactive Card 2: Live Synastry / Resonance Simulator -->
+        <div class="mystic-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between scroll-morph" style="transition-delay: 100ms;">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-accent-soft mb-4">
+              <span>ИНТЕРАКТИВ 02 // СИНАСТРИЯ</span>
+              <span id="syn-percent-badge" class="text-accent-1 font-semibold">94% Резонанс</span>
+            </div>
+            <h3 class="font-serif text-2xl sm:text-3xl text-white mb-2">Притяжение двух орбит</h3>
+            <p class="text-slate-400 text-xs sm:text-sm font-light mb-4">
+              Выбери две стихии и посмотри, как взаимодействуют ваши энергетические поля.
+            </p>
+          </div>
+
+          <!-- Binary Orbits SVG -->
+          <div class="relative w-full h-48 flex items-center justify-center my-2">
+            <svg id="synastry-mini-svg" viewBox="0 0 300 180" class="w-full h-full overflow-visible"></svg>
+          </div>
+
+          <!-- Element Selectors & Slider -->
+          <div class="space-y-4 pt-2">
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
+              <div>
+                <span class="text-[10px] font-mono uppercase text-slate-400 block mb-1">Твоя стихия:</span>
+                <select id="syn-elem-1" onchange="updateSynastryWidget()" class="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none">
+                  <option value="fire">🔥 Огонь (Овен, Лев, Стрелец)</option>
+                  <option value="water">🌊 Вода (Рак, Скорпион, Рыбы)</option>
+                  <option value="air">🌪 Воздух (Близнецы, Весы, Водолей)</option>
+                  <option value="earth">🌿 Земля (Телец, Дева, Козерог)</option>
+                </select>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase text-slate-400 block mb-1">Партнёр:</span>
+                <select id="syn-elem-2" onchange="updateSynastryWidget()" class="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none">
+                  <option value="air">🌪 Воздух (Близнецы, Весы, Водолей)</option>
+                  <option value="fire">🔥 Огонь (Овен, Лев, Стрелец)</option>
+                  <option value="water">🌊 Вода (Рак, Скорпион, Рыбы)</option>
+                  <option value="earth">🌿 Земля (Телец, Дева, Козерог)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="syn-verdict-box" class="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-200 font-light leading-relaxed">
+              Яркий творческий и страстный союз: Воздух раздувает пламя Огня, рождая общие идеи и мощное притяжение.
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Card 3: Live Lunar Energy & Phase Explorer -->
+        <div class="mystic-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between scroll-morph" style="transition-delay: 200ms;">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-accent-soft mb-4">
+              <span>ИНТЕРАКТИВ 03 // ЛУННЫЙ ЦИКЛ</span>
+              <span id="moon-phase-label" class="text-accent-1">Растущая • 74%</span>
+            </div>
+            <h3 class="font-serif text-2xl sm:text-3xl text-white mb-2">Ритмы и энергия Луны</h3>
+            <p class="text-slate-400 text-xs sm:text-sm font-light mb-4">
+              Двигай ползунок фазы, чтобы узнать, для каких шагов открыто пространство.
+            </p>
+          </div>
+
+          <!-- Dynamic Moon SVG -->
+          <div class="relative w-40 h-40 mx-auto my-2 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full blur-2xl opacity-30" style="background: var(--accent-1);"></div>
+            <svg id="interactive-moon-svg" viewBox="0 0 160 160" class="w-full h-full overflow-visible"></svg>
+          </div>
+
+          <div class="space-y-4 pt-2">
+            <div>
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+                <span>Новолуние</span>
+                <span>Полнолуние</span>
+                <span>Завершение</span>
+              </div>
+              <input type="range" id="moon-slider" min="1" max="99" value="36" oninput="updateMoonWidget(this.value)" class="cosmic-slider" />
+            </div>
+
+            <div id="moon-advice-box" class="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-200 font-light leading-relaxed">
+              Фаза активного набора высоты: идеальное время для смелых запусков, важных переговоров и заявления о себе.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 6. EXPRESS PERSONAL READING ("КОСМИЧЕСКИЙ КОД ЗА 10 СЕКУНД")        -->
+    <!-- =================================================================== -->
+    <section id="express-code" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+      <div class="mystic-card rounded-3xl p-6 sm:p-12 border border-accent shadow-2xl scroll-morph">
+
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="font-mono text-xs uppercase tracking-[0.25em] text-accent-1 block mb-2">Персональный экспресс-расчёт</span>
+          <h2 class="font-serif text-3xl sm:text-5xl text-white font-normal">
+            Узнай свой <span class="italic gradient-headline">космический код</span> за 10 секунд
+          </h2>
+          <p class="text-slate-400 text-sm sm:text-base mt-2.5 font-light">
+            Введи дату рождения — система мгновенно вычислит твою солнечную частоту, центральный Аркан Судьбы и вектор силы.
+          </p>
+        </div>
+
+        <!-- Clean 3-Field Express Form -->
+        <form onsubmit="calculateExpressCode(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-10">
+          <div class="sm:col-span-4">
+            <label class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1.5">Твоё имя</label>
+            <input type="text" id="exp-name" value="Александра" required class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-300 transition-colors" placeholder="Имя" />
+          </div>
+
+          <div class="sm:col-span-4">
+            <label class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1.5">Дата рождения</label>
+            <input type="date" id="exp-date" value="1996-08-19" required class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white text-sm font-mono focus:outline-none focus:border-amber-300 transition-colors" />
+          </div>
+
+          <div class="sm:col-span-4 flex items-end">
+            <button type="submit" class="w-full py-3.5 px-6 rounded-2xl text-xs font-mono uppercase tracking-widest btn-cosmic h-[50px] flex items-center justify-center gap-2">
+              <span>Расшифровать</span>
+              <span>✦</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Express Result Display with Animated Archetype SVGs -->
+        <div id="express-result-card" class="rounded-2xl bg-black/45 border border-white/10 p-6 sm:p-8 transition-all duration-500">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+            <!-- Box 1: Solar Frequency with Animated Solar Corona SVG -->
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-white/10 border border-accent flex items-center justify-center text-accent-1 shrink-0 relative">
+                <svg class="w-10 h-10 overflow-visible" viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" class="anim-spin-cw"/>
+                  <circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.5"/>
+                </svg>
+                <span id="exp-sun-glyph" class="absolute inset-0 flex items-center justify-center text-lg text-white">♌</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Солнечная частота</span>
+                <span id="exp-sun-title" class="font-serif text-xl text-white font-medium">Лев • Огонь</span>
+              </div>
+            </div>
+
+            <!-- Box 2: Central Arcana with Animated Sacred Octagram SVG -->
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-white/10 border border-accent flex items-center justify-center text-accent-1 shrink-0 relative">
+                <svg class="w-10 h-10 overflow-visible" viewBox="0 0 40 40" fill="none">
+                  <rect x="9" y="9" width="22" height="22" stroke="currentColor" stroke-width="1" stroke-opacity="0.65" class="anim-spin-cw"/>
+                  <rect x="9" y="9" width="22" height="22" transform="rotate(45 20 20)" stroke="currentColor" stroke-width="1" stroke-opacity="0.65" class="anim-spin-ccw"/>
+                </svg>
+                <span id="exp-arcana-num" class="absolute inset-0 flex items-center justify-center font-serif text-base text-white font-semibold">XIX</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Центральный Аркан</span>
+                <span id="exp-arcana-title" class="font-serif text-xl text-white font-medium">Солнце и Масштаб</span>
+              </div>
+            </div>
+
+            <!-- Box 3: Main Gift with Animated Compass Star SVG -->
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-white/10 border border-accent flex items-center justify-center text-accent-1 shrink-0">
+                <svg class="w-8 h-8 overflow-visible" viewBox="0 0 36 36" fill="none">
+                  <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="1" class="anim-dash-flow"/>
+                  <path d="M18 6 L20.5 15.5 L30 18 L20.5 20.5 L18 30 L15.5 20.5 L6 18 L15.5 15.5 Z" fill="currentColor" class="anim-pulse-node"/>
+                </svg>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Главный дар</span>
+                <span id="exp-gift-title" class="font-serif text-xl text-white font-medium">Притяжение и Лидерство</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Personal Summary Paragraph -->
+          <p id="exp-summary-text" class="text-slate-200 text-sm sm:text-base font-light leading-relaxed mb-6">
+            <strong class="text-white font-medium">Александра</strong>, твоя ведущая частота объединяет солнечный огонь и энергию процветания. Твой главный рост начинается там, где ты выходишь из тени, запускаешь собственные проекты и ведёшь за собой людей.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <span class="text-xs text-slate-400">В полной версии: все 12 домов, кармический хвост, деньги и синастрия.</span>
+            <button onclick="openActionModal('Полный разбор Натальной карты и Матрицы')" class="px-6 py-2.5 rounded-full text-xs font-mono uppercase tracking-wider btn-cosmic shrink-0">
+              Получить полную карту →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 7. PRICING ORBITS (ТАРИФЫ)                                          -->
+    <!-- =================================================================== -->
+    <section id="orbits" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-2xl mx-auto mb-14 scroll-morph">
+        <span class="font-mono text-xs uppercase tracking-[0.25em] text-accent-1 block mb-3">Тарифные планы</span>
+        <h2 class="font-serif text-4xl sm:text-5xl text-white font-normal">
+          Выбери свою <span class="italic gradient-headline">орбиту погружения</span>
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-7 items-stretch">
+
+        <!-- Tier 1: Старт -->
+        <div class="mystic-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between scroll-morph">
+          <div>
+            <span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Орбита 01 // Знакомство</span>
+            <h3 class="font-serif text-3xl text-white mt-1 mb-2">Искатель</h3>
+            <div class="flex items-baseline gap-2 my-5">
+              <span class="font-serif text-4xl sm:text-5xl text-white">0 ₽</span>
+              <span class="text-xs text-slate-400">/ навсегда</span>
+            </div>
+            <ul class="space-y-3 text-sm text-slate-300 font-light border-t border-white/10 pt-5">
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Экспресс-расчёт космического кода</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Карта дня и базовый лунный ритм</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Проверка резонанса стихий</li>
+            </ul>
+          </div>
+          <a href="#express-code" class="mt-8 w-full py-3.5 rounded-full text-center text-xs font-mono uppercase tracking-widest btn-glass block">
+            Начать бесплатно
+          </a>
+        </div>
+
+        <!-- Tier 2: Глубина (Featured) -->
+        <div class="mystic-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between border-2 border-accent relative md:-translate-y-3 shadow-2xl scroll-morph" style="transition-delay: 100ms;">
+          <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/10 border border-accent text-[10px] font-mono uppercase tracking-wider text-accent-soft">
+            Выбор 84% пользователей
+          </div>
+          <div>
+            <span class="font-mono text-[10px] uppercase tracking-widest text-accent-1">Орбита 02 // Полный доступ</span>
+            <h3 class="font-serif text-3xl text-white mt-1 mb-2">Адепт Вселенной</h3>
+            <div class="flex items-baseline gap-2 my-5">
+              <span class="font-serif text-4xl sm:text-5xl text-white">990 ₽</span>
+              <span class="text-xs text-slate-400">/ месяц</span>
+            </div>
+            <ul class="space-y-3 text-sm text-slate-200 font-light border-t border-white/10 pt-5">
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Полная Натальная карта и все 12 домов</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Матрица Судьбы: финансы, таланты и карма</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Безлимитная проверка совместимости пар</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Персональный календарь удачных дней</li>
+            </ul>
+          </div>
+          <button onclick="openActionModal('Тариф «Адепт Вселенной»')" class="mt-8 w-full py-4 rounded-full text-center text-xs font-mono uppercase tracking-widest btn-cosmic block">
+            Активировать доступ
+          </button>
+        </div>
+
+        <!-- Tier 3: VIP -->
+        <div class="mystic-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between scroll-morph" style="transition-delay: 200ms;">
+          <div>
+            <span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Орбита 03 // Персонально</span>
+            <h3 class="font-serif text-3xl text-white mt-1 mb-2">Архитектор Судьбы</h3>
+            <div class="flex items-baseline gap-2 my-5">
+              <span class="font-serif text-4xl sm:text-5xl text-white">4 900 ₽</span>
+              <span class="text-xs text-slate-400">/ навсегда + книга PDF</span>
+            </div>
+            <ul class="space-y-3 text-sm text-slate-300 font-light border-t border-white/10 pt-5">
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Всё из тарифа «Адепт» без ограничений</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Персональная книга-разбор на 65 страниц</li>
+              <li class="flex items-center gap-2.5"><span class="text-accent-1">✦</span> Годовой солярный прогноз по месяцам</li>
+            </ul>
+          </div>
+          <button onclick="openActionModal('Тариф «Архитектор Судьбы»')" class="mt-8 w-full py-3.5 rounded-full text-center text-xs font-mono uppercase tracking-widest btn-glass block">
+            Заказать полный разбор
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 8. FOOTER                                                           -->
+    <!-- =================================================================== -->
+    <footer class="mt-auto border-t border-white/10 bg-[#020307]/85 backdrop-blur-xl py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full border border-accent flex items-center justify-center text-accent-1 text-sm">✦</div>
+          <span class="font-serif text-xl tracking-[0.18em] text-white">MYSTIC SPACE</span>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 text-xs text-slate-400">
+          <a href="#ecosystem" class="hover:text-white transition-colors">Экосистема</a>
+          <a href="#interactive-lab" class="hover:text-white transition-colors">Таро и Синастрия</a>
+          <a href="#express-code" class="hover:text-white transition-colors">Расчёт кода</a>
+          <a href="#orbits" class="hover:text-white transition-colors">Тарифы</a>
+        </div>
+
+        <p class="text-xs text-slate-500 font-mono">
+          © 2026 MYSTIC SPACE. Все права защищены.
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FLOATING SPACE FLIGHT CONTROLLER HUD WITH CONTINUOUS SPEED & PALETTES -->
+  <!-- ===================================================================== -->
+  <div class="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-5 sm:right-5 z-50 pointer-events-auto max-w-md sm:w-[390px] ml-auto">
+    <div class="mystic-card rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-accent backdrop-blur-2xl space-y-2.5">
+      <!-- Top Row: Mystical Flight Controls -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="w-2 h-2 rounded-full bg-current text-accent-1 animate-ping shrink-0"></span>
+          <span id="hud-flight-state" class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-accent-soft truncate">
+            ДЫХАНИЕ ВСЕЛЕННОЙ • ПОТОК
+          </span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="toggleOrbitLock()" id="orbit-lock-btn" class="px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/15 bg-white/10 text-accent-1 hover:bg-white/20 transition-all" title="Плавное кружение в пространстве">
+            ⟳ Кружение
+          </button>
+          <button onclick="togglePureSpace()" id="pure-space-btn" class="px-2.5 py-0.5 rounded-md text-[10px] font-mono border border-accent bg-white/5 text-white hover:bg-white/15 transition-all flex items-center gap-1">
+            <span>✦</span>
+            <span id="pure-space-label">Чистое небо</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Flight Speed Slider -->
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 w-14 shrink-0">Скорость:</span>
+        <input
+          type="range"
+          id="flight-speed-slider"
+          min="0"
+          max="5"
+          step="0.05"
+          value="1.2"
+          oninput="updateFlightSpeedFromSlider(this.value)"
+          class="cosmic-slider flex-1"
+          aria-label="Регулятор скорости движения в космосе"
+        />
+        <span id="hud-speed-readout" class="font-mono text-[11px] text-accent-1 font-medium w-12 text-right shrink-0">
+          Плавно
+        </span>
+      </div>
+
+      <!-- NEW: Distance / Zoom Slider (Отдаление / Приближение) -->
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 w-14 shrink-0">Дистанция:</span>
+        <input
+          type="range"
+          id="galaxy-zoom-slider"
+          min="320"
+          max="1600"
+          step="10"
+          value="640"
+          oninput="updateGalaxyZoomFromSlider(this.value)"
+          class="cosmic-slider flex-1"
+          aria-label="Ползунок отдаления и приближения галактики"
+        />
+        <span id="hud-zoom-readout" class="font-mono text-[11px] text-accent-1 font-medium w-12 text-right shrink-0">
+          640 пк
+        </span>
+      </div>
+
+      <!-- NEW: X-Axis Slider (Влево / Вправо) -->
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 w-14 shrink-0">X (Ось):</span>
+        <input
+          type="range"
+          id="galaxy-x-slider"
+          min="-500"
+          max="500"
+          step="5"
+          value="0"
+          oninput="updateGalaxyXFromSlider(this.value)"
+          class="cosmic-slider flex-1"
+          aria-label="Ползунок смещения галактики влево и вправо"
+        />
+        <span id="hud-x-readout" class="font-mono text-[11px] text-accent-1 font-medium w-12 text-right shrink-0">
+          0 пк
+        </span>
+      </div>
+
+      <!-- NEW: Y-Axis Slider (Вверх / Вниз) -->
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 w-14 shrink-0">Y (Ось):</span>
+        <input
+          type="range"
+          id="galaxy-y-slider"
+          min="-350"
+          max="350"
+          step="5"
+          value="0"
+          oninput="updateGalaxyYFromSlider(this.value)"
+          class="cosmic-slider flex-1"
+          aria-label="Ползунок смещения галактики вверх и вниз"
+        />
+        <span id="hud-y-readout" class="font-mono text-[11px] text-accent-1 font-medium w-12 text-right shrink-0">
+          0 пк
+        </span>
+      </div>
+
+      <!-- Live Palette Switcher inside Bottom Widget -->
+      <div class="pt-2 border-t border-white/10">
+        <div class="text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Цветовая атмосфера:</div>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="setCosmicPalette('gold')" id="pal-gold" class="py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all bg-white/15 text-white border border-white/25">
+            <span class="w-2 h-2 rounded-full bg-[#E5C158]"></span> Золото
+          </button>
+          <button onclick="setCosmicPalette('nebula')" id="pal-nebula" class="py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all text-slate-400 hover:text-white border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-[#C084FC]"></span> Орион
+          </button>
+          <button onclick="setCosmicPalette('aurora')" id="pal-aurora" class="py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all text-slate-400 hover:text-white border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-[#34D399]"></span> Сияние
+          </button>
+          <button onclick="setCosmicPalette('eclipse')" id="pal-eclipse" class="py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all text-slate-400 hover:text-white border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-[#FB923C]"></span> Затмение
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Mystical Realm Selector Pills -->
+      <div class="grid grid-cols-4 gap-1.5 pt-1.5 border-t border-white/10">
+        <button onclick="selectCosmicTarget(0)" id="target-pill-0" class="px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all bg-white/15 text-white border border-white/25">
+          Спираль
+        </button>
+        <button onclick="selectCosmicTarget(1)" id="target-pill-1" class="px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all text-slate-400 hover:text-white border border-transparent">
+          Вихрь
+        </button>
+        <button onclick="selectCosmicTarget(2)" id="target-pill-2" class="px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all text-slate-400 hover:text-white border border-transparent">
+          Затмение
+        </button>
+        <button onclick="selectCosmicTarget(3)" id="target-pill-3" class="px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all text-slate-400 hover:text-white border border-transparent">
+          Эфир
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL DIALOG FOR FULL ACCESS / PERSONAL READING                       -->
+  <!-- ===================================================================== -->
+  <div id="action-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
+    <div class="mystic-card rounded-3xl max-w-md w-full p-6 sm:p-8 border border-accent relative shadow-2xl">
+      <button onclick="closeActionModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white">
+        ✕
+      </button>
+
+      <div id="modal-form">
+        <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-1 block mb-1">MYSTIC SPACE • ДОСТУП</span>
+        <h3 id="modal-plan-title" class="font-serif text-3xl text-white mb-2">Полный разбор судьбы</h3>
+        <p class="text-slate-300 text-xs sm:text-sm font-light mb-6">
+          Оставь контакт — мы откроем доступ к твоему персональному пространству и пришлём полную расшифровку.
+        </p>
+
+        <form onsubmit="submitActionModal(event)" class="space-y-4">
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Твоё имя</label>
+            <input type="text" required placeholder="Александра" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-300" />
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Telegram или Email</label>
+            <input type="text" required placeholder="@username или email" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-300" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-xl text-xs font-mono uppercase tracking-widest btn-cosmic">
+            Подтвердить и войти ✦
+          </button>
+        </form>
+      </div>
+
+      <div id="modal-success" class="hidden text-center py-6 space-y-4">
+        <div class="w-14 h-14 rounded-full bg-white/10 border border-accent mx-auto flex items-center justify-center text-2xl text-accent-1">
+          ✦
+        </div>
+        <h4 class="font-serif text-3xl text-white">Заявка принята</h4>
+        <p class="text-slate-300 text-sm font-light">
+          Твой персональный доступ формируется. Мы свяжемся с тобой в ближайшее время.
+        </p>
+        <button onclick="closeActionModal()" class="px-6 py-2.5 rounded-full text-xs font-mono uppercase tracking-wider btn-glass">
+          Вернуться к звёздам
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*************************************************************************
+     * 1. MULTI-PALETTE THEME SYSTEM (Золото / Орион / Сияние / Затмение)
+     *************************************************************************/
+    const PALETTES = {
+      gold: {
+        bgDeep: '#030408',
+        accent1: '#E5C158',
+        accent1Rgb: '229, 193, 88',
+        accent2: '#60A5FA',
+        accent2Rgb: '96, 165, 250',
+        accentSoft: '#F5E6C8',
+        nebulaCore: [215, 165, 85],
+        nebulaMid: [70, 115, 210],
+        nebulaOuter: [130, 85, 195]
+      },
+      nebula: {
+        bgDeep: '#05030A',
+        accent1: '#C084FC',
+        accent1Rgb: '192, 132, 252',
+        accent2: '#22D3EE',
+        accent2Rgb: '34, 211, 238',
+        accentSoft: '#F3E8FF',
+        nebulaCore: [185, 95, 250],
+        nebulaMid: [45, 190, 230],
+        nebulaOuter: [220, 70, 165]
+      },
+      aurora: {
+        bgDeep: '#020709',
+        accent1: '#34D399',
+        accent1Rgb: '52, 211, 153',
+        accent2: '#38BDF8',
+        accent2Rgb: '56, 189, 248',
+        accentSoft: '#D1FAE5',
+        nebulaCore: [45, 210, 155],
+        nebulaMid: [55, 165, 245],
+        nebulaOuter: [110, 95, 235]
+      },
+      eclipse: {
+        bgDeep: '#080305',
+        accent1: '#FB923C',
+        accent1Rgb: '251, 146, 60',
+        accent2: '#F43F5E',
+        accent2Rgb: '244, 63, 94',
+        accentSoft: '#FFEDD5',
+        nebulaCore: [250, 135, 65],
+        nebulaMid: [235, 65, 100],
+        nebulaOuter: [140, 60, 180]
+      }
+    };
+
+    let activePaletteKey = 'gold';
+
+    function setCosmicPalette(key) {
+      const p = PALETTES[key];
+      if (!p) return;
+      activePaletteKey = key;
+
+      const root = document.documentElement;
+      root.style.setProperty('--bg-deep', p.bgDeep);
+      root.style.setProperty('--accent-1', p.accent1);
+      root.style.setProperty('--accent-1-rgb', p.accent1Rgb);
+      root.style.setProperty('--accent-2', p.accent2);
+      root.style.setProperty('--accent-2-rgb', p.accent2Rgb);
+      root.style.setProperty('--accent-soft', p.accentSoft);
+      root.style.setProperty('--card-border', `rgba(${p.accent1Rgb}, 0.24)`);
+
+      ['gold', 'nebula', 'aurora', 'eclipse'].forEach(k => {
+        const btn = document.getElementById(`pal-${k}`);
+        if (!btn) return;
+        if (k === key) {
+          btn.className = 'py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all bg-white/15 text-white border border-white/25';
+        } else {
+          btn.className = 'py-1 px-1 rounded-lg text-[10px] font-mono flex items-center justify-center gap-1 transition-all text-slate-400 hover:text-white border border-transparent';
+        }
+      });
+
+      updateNebulaColors(p);
+      renderHeroGyroscope();
+      renderMorphStage(currentEcoStep);
+      renderTarotFrontSVG(tarotIndex);
+      updateSynastryWidget();
+      updateMoonWidget(document.getElementById('moon-slider').value);
+    }
+
+    /*************************************************************************
+     * 2. 3D GALAXY APPROACH, DECELERATION & 360° ORBITAL FLY-AROUND ENGINE
+     *************************************************************************/
+    const canvas = document.getElementById('cosmos-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    const flight = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      sliderSpeed: 1.2,
+      scrollBoost: 0,
+      state: 'APPROACH',
+      lockOrbit: true,
+      targetIndex: 0,
+      galaxyDist: 640,
+      userOffsetX: 0,
+      userOffsetY: 0,
+      orbitRadius: 430,
+      orbitAzimuth: 0.4,
+      orbitPitch: 0.46,
+      orbitProgress: 0,
+      targetSteerX: 0,
+      targetSteerY: 0,
+      steerX: 0,
+      steerY: 0,
+      focalLength: 520,
+      maxDepth: 2200
+    };
+
+    const COSMIC_TARGETS = [
+      {
+        id: 'andromeda',
+        name: 'ЗВЁЗДНАЯ СПИРАЛЬ',
+        type: 'spiral',
+        arms: 2,
+        tiltX: 0.56,
+        coreColor: [255, 232, 185],
+        armColor1: [115, 178, 255],
+        armColor2: [238, 192, 105],
+        dustColor: [235, 95, 135],
+        darkLaneColor: [6, 8, 18]
+      },
+      {
+        id: 'whirlpool',
+        name: 'ВИХРЬ СУДЬБЫ',
+        type: 'grand-spiral',
+        arms: 2,
+        tiltX: 0.34,
+        coreColor: [255, 240, 215],
+        armColor1: [72, 195, 255],
+        armColor2: [188, 135, 255],
+        dustColor: [248, 105, 165],
+        darkLaneColor: [8, 5, 18]
+      },
+      {
+        id: 'gargantua',
+        name: 'ЧЁРНОЕ СОЛНЦЕ',
+        type: 'blackhole',
+        arms: 4,
+        tiltX: 0.25,
+        coreColor: [255, 225, 165],
+        armColor1: [255, 152, 68],
+        armColor2: [238, 72, 98],
+        dustColor: [165, 95, 245],
+        darkLaneColor: [4, 3, 9]
+      },
+      {
+        id: 'orion',
+        name: 'ЭФИР ДУШИ',
+        type: 'nebula-cluster',
+        arms: 3,
+        tiltX: 0.42,
+        coreColor: [255, 238, 195],
+        armColor1: [48, 198, 225],
+        armColor2: [238, 158, 78],
+        dustColor: [215, 85, 145],
+        darkLaneColor: [7, 10, 20]
+      }
+    ];
+
+    const STAR_COUNT = 2400;
+    const GALAXY_PARTICLE_COUNT = 3600;
+    let stars3D = [];
+    let deepFieldGalaxies = [];
+    let galaxyParticles = [];
+    let nebulaPuffs = [];
+    let darkDustLanes = [];
+
+    // Realistic Stellar Blackbody Spectra (O, B, A, F, G, K, M classes)
+    const STAR_SPECTRA = [
+      [155, 188, 255], // Class O - Blue-violet supergiant
+      [185, 212, 255], // Class B - Deep sapphire-white
+      [235, 243, 255], // Class A - Pure crisp white
+      [255, 249, 238], // Class F - Warm ivory
+      [255, 236, 198], // Class G - Solar champagne gold
+      [255, 204, 142], // Class K - Rich amber giant
+      [255, 162, 112]  // Class M - Deep ruby-orange
+    ];
+
+    // Pre-rendered Optical Star & Organic Nebula Sprite Atlases
+    const starSpriteCache = new Map();
+    const nebulaSpriteCache = new Map();
+
+    function getGlowingStarSprite(r, g, b, hasSpikes = false) {
+      const key = `${r},${g},${b},${hasSpikes ? 1 : 0}`;
+      if (starSpriteCache.has(key)) return starSpriteCache.get(key);
+
+      const size = hasSpikes ? 96 : 36;
+      const half = size / 2;
+      const off = document.createElement('canvas');
+      off.width = size;
+      off.height = size;
+      const octx = off.getContext('2d');
+
+      // 1. Airy Disk & Spectral Outer Halo (Astrophotography Point-Spread Function)
+      const grad = octx.createRadialGradient(half, half, 0, half, half, hasSpikes ? half * 0.58 : half);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.11, 'rgba(255, 255, 255, 0.98)');
+      grad.addColorStop(0.24, `rgba(${r}, ${g}, ${b}, 0.82)`);
+      grad.addColorStop(0.52, `rgba(${r}, ${g}, ${b}, 0.22)`);
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+
+      octx.fillStyle = grad;
+      octx.beginPath();
+      octx.arc(half, half, half, 0, Math.PI * 2);
+      octx.fill();
+
+      // 2. Authentic Deep-Space Telescope 8-Point Diffraction Spikes (Hexagonal Mirror 6-Point + 2-Point Strut)
+      if (hasSpikes) {
+        const angles = [0, Math.PI / 6, Math.PI / 2, (5 * Math.PI) / 6];
+        angles.forEach((ang, idx) => {
+          octx.save();
+          octx.translate(half, half);
+          octx.rotate(ang);
+
+          const reach = idx === 0 ? half * 0.72 : half * 0.98;
+          const thickness = idx === 2 ? 1.55 : 1.15;
+
+          const spikeGrad = octx.createLinearGradient(-reach, 0, reach, 0);
+          spikeGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+          spikeGrad.addColorStop(0.25, `rgba(${r}, ${g}, ${b}, 0.35)`);
+          spikeGrad.addColorStop(0.45, 'rgba(255, 250, 235, 0.92)');
+          spikeGrad.addColorStop(0.5, 'rgba(255, 255, 255, 1)');
+          spikeGrad.addColorStop(0.55, 'rgba(255, 250, 235, 0.92)');
+          spikeGrad.addColorStop(0.75, `rgba(${r}, ${g}, ${b}, 0.35)`);
+          spikeGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+
+          octx.fillStyle = spikeGrad;
+          octx.fillRect(-reach, -thickness * 0.5, reach * 2, thickness);
+          octx.restore();
+        });
+      }
+
+      starSpriteCache.set(key, off);
+      return off;
+    }
+
+    // Pre-rendered Organic Multi-Lobe Filamentous Cloud Sprite (looks like real gas/dust instead of flat circles)
+    function getOrganicNebulaSprite(r, g, b, variant = 0, isDarkDust = false) {
+      const key = `${r},${g},${b},${variant},${isDarkDust ? 1 : 0}`;
+      if (nebulaSpriteCache.has(key)) return nebulaSpriteCache.get(key);
+
+      const size = 160;
+      const half = size / 2;
+      const off = document.createElement('canvas');
+      off.width = size;
+      off.height = size;
+      const octx = off.getContext('2d');
+
+      // Seeded deterministic sub-lobes so each cloud has wispy, asymmetric structure
+      const subLobes = 7;
+      for (let i = 0; i < subLobes; i++) {
+        const a = (i * 2.39996) + variant * 1.7;
+        const dist = (i === 0 ? 0 : (10 + (i * 4.5))) * (isDarkDust ? 0.85 : 1);
+        const lx = half + Math.cos(a) * dist;
+        const ly = half + Math.sin(a) * dist * 0.72;
+        const rad = half * (i === 0 ? 0.78 : (0.42 + (i % 3) * 0.14));
+
+        const gLobe = octx.createRadialGradient(lx, ly, 0, lx, ly, rad);
+        if (isDarkDust) {
+          gLobe.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.68)`);
+          gLobe.addColorStop(0.48, `rgba(${r}, ${g}, ${b}, 0.34)`);
+          gLobe.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        } else {
+          gLobe.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.36)`);
+          gLobe.addColorStop(0.42, `rgba(${r}, ${g}, ${b}, 0.16)`);
+          gLobe.addColorStop(0.75, `rgba(${r}, ${g}, ${b}, 0.04)`);
+          gLobe.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        }
+        octx.fillStyle = gLobe;
+        octx.beginPath();
+        octx.arc(lx, ly, rad, 0, Math.PI * 2);
+        octx.fill();
+      }
+
+      nebulaSpriteCache.set(key, off);
+      return off;
+    }
+
+    function buildGalaxyGeometry(targetIdx) {
+      const target = COSMIC_TARGETS[targetIdx];
+      galaxyParticles = [];
+      nebulaPuffs = [];
+      darkDustLanes = [];
+
+      // 1. Build 3,600 Photorealistic 3D Star & Ionized Knot Particles
+      for (let i = 0; i < GALAXY_PARTICLE_COUNT; i++) {
+        let x, y, z, r, g, b, size, alpha, isHII = false, hasSpikes = false;
+
+        if (target.type === 'blackhole') {
+          // Relativistic Accretion Disk + Doppler Asymmetry + Astrophysical Polar Jets
+          if (i < 420) {
+            const side = i % 2 === 0 ? 1 : -1;
+            const distY = 28 + Math.pow(Math.random(), 0.72) * 340;
+            const coneSpread = distY * 0.075;
+            x = (Math.random() - 0.5) * coneSpread;
+            z = (Math.random() - 0.5) * coneSpread;
+            y = side * distY;
+            r = 165; g = 218; b = 255;
+            size = 1.1 + Math.random() * 1.7;
+            alpha = 0.78 * (1 - distY / 370);
+          } else {
+            const rad = 44 + Math.pow(Math.random(), 1.55) * 330;
+            const angle = Math.random() * Math.PI * 2 + (380 / rad) * 1.8;
+            x = Math.cos(angle) * rad;
+            z = Math.sin(angle) * rad;
+            y = (Math.random() - 0.5) * (3.2 + (rad - 44) * 0.045);
+
+            const heat = Math.max(0, 1 - (rad - 44) / 270);
+            r = Math.round(target.coreColor[0] * heat + target.armColor1[0] * (1 - heat));
+            g = Math.round(target.coreColor[1] * heat + target.armColor2[1] * (1 - heat));
+            b = Math.round(target.coreColor[2] * heat + target.dustColor[2] * (1 - heat));
+            hasSpikes = Math.random() < 0.018;
+            size = rad < 64 ? 2.1 : (0.75 + Math.random() * 1.45);
+            alpha = Math.min(1, 0.38 + heat * 0.62);
+          }
+        } else if (target.type === 'nebula-cluster') {
+          // JWST "Cosmic Cliffs" (Carina / Orion) Ionized Ridge & Star-Forming Pillars
+          const rad = Math.pow(Math.random(), 0.88) * 340;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const ridge = 1 + 0.42 * Math.sin(theta * 3) * Math.cos(phi * 2.5);
+          x = rad * Math.sin(phi) * Math.cos(theta) * ridge;
+          y = rad * Math.cos(phi) * 0.62 + Math.sin(x * 0.02) * 18;
+          z = rad * Math.sin(phi) * Math.sin(theta) * ridge;
+
+          const mix = Math.random();
+          // Golden-amber hydrogen-sulfur ridges + turquoise oxygen + ruby young stars
+          const col = mix < 0.42 ? target.armColor1 : (mix < 0.82 ? target.armColor2 : target.dustColor);
+          r = Math.min(255, col[0] + Math.round((Math.random() - 0.5) * 28));
+          g = Math.min(255, col[1] + Math.round((Math.random() - 0.5) * 28));
+          b = Math.min(255, col[2] + Math.round((Math.random() - 0.5) * 28));
+
+          isHII = Math.random() < 0.065;
+          hasSpikes = isHII && Math.random() < 0.52;
+          size = isHII ? (2.2 + Math.random() * 2.1) : (0.7 + Math.random() * 1.35);
+          alpha = isHII ? 0.98 : (0.32 + (1 - rad / 355) * 0.62);
+        } else {
+          // Photorealistic Spiral Galaxy (Andromeda / Whirlpool M51)
+          const isCoreBulge = i < 780;
+          if (isCoreBulge) {
+            // Dense Golden-Ivory Galactic Bulge (Population II stars)
+            const rad = Math.pow(Math.random(), 1.85) * 95;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            x = rad * Math.sin(phi) * Math.cos(theta);
+            y = rad * Math.cos(phi) * 0.42;
+            z = rad * Math.sin(phi) * Math.sin(theta);
+            r = Math.min(255, target.coreColor[0] + Math.round((Math.random() - 0.5) * 18));
+            g = Math.min(255, target.coreColor[1] + Math.round((Math.random() - 0.5) * 18));
+            b = Math.min(255, target.coreColor[2] + Math.round((Math.random() - 0.5) * 18));
+            hasSpikes = Math.random() < 0.015;
+            size = 0.95 + Math.random() * 1.65;
+            alpha = 0.92 * (1 - rad / 102) + 0.14;
+          } else {
+            // Logarithmic Spiral Arms with Young OB Blue Giants + Ruby H-alpha Knots
+            const armIdx = i % target.arms;
+            const isSpur = Math.random() < 0.22;
+            const rad = 32 + Math.pow(Math.random(), 1.08) * 345;
+            const winding = (rad / 340) * Math.PI * (target.type === 'grand-spiral' ? 3.55 : 2.95);
+            const armBaseAngle = (armIdx * Math.PI * 2) / target.arms + (isSpur ? 0.42 : 0);
+            const scatter = ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * (0.42 + (rad / 340) * 0.58);
+            const angle = armBaseAngle + winding + scatter;
+
+            x = Math.cos(angle) * rad;
+            z = Math.sin(angle) * rad;
+            const warpY = Math.sin(angle * 2) * (rad > 170 ? (rad - 170) * 0.07 : 0);
+            y = ((Math.random() + Math.random()) / 2 - 0.5) * (11 + rad * 0.035) + warpY;
+
+            const coreBlend = Math.max(0, 1 - rad / 220);
+            isHII = Math.random() < 0.058;
+            if (isHII) {
+              // Glowing Pink/Ruby H-Alpha Star-Forming Regions strung along spiral arms
+              r = target.dustColor[0];
+              g = target.dustColor[1];
+              b = target.dustColor[2];
+              hasSpikes = Math.random() < 0.28;
+              size = 2.0 + Math.random() * 1.85;
+              alpha = 0.94;
+            } else {
+              const armCol = Math.random() < 0.62 ? target.armColor1 : target.armColor2;
+              r = Math.round(target.coreColor[0] * coreBlend + armCol[0] * (1 - coreBlend));
+              g = Math.round(target.coreColor[1] * coreBlend + armCol[1] * (1 - coreBlend));
+              b = Math.round(target.coreColor[2] * coreBlend + armCol[2] * (1 - coreBlend));
+              hasSpikes = Math.random() < 0.018;
+              size = 0.68 + Math.random() * 1.48;
+              alpha = Math.max(0.22, (1 - rad / 390) * 0.88);
+            }
+          }
+        }
+
+        const sprite = getGlowingStarSprite(r, g, b, hasSpikes);
+        galaxyParticles.push({
+          x, y, z, r, g, b, size, alpha, isHII, hasSpikes, sprite,
+          twinkleSpeed: 1.2 + Math.random() * 2.2,
+          twinklePhase: Math.random() * Math.PI * 2
+        });
+      }
+
+      // 2. Build Volumetric Organic Gas Nebulae along the Spiral Arms / Cliffs
+      for (let i = 0; i < 64; i++) {
+        const rad = i < 10 ? (Math.random() * 48) : (42 + Math.random() * 295);
+        const armIdx = i % target.arms;
+        const winding = (rad / 340) * Math.PI * (target.type === 'grand-spiral' ? 3.55 : 2.95);
+        const angle = (armIdx * Math.PI * 2) / target.arms + winding + (Math.random() - 0.5) * 0.38;
+        const x = Math.cos(angle) * rad;
+        const z = Math.sin(angle) * rad;
+        const y = (Math.random() - 0.5) * (target.type === 'nebula-cluster' ? 95 : 22);
+        const col = i < 10 ? target.coreColor : (i % 3 === 0 ? target.dustColor : (i % 2 === 0 ? target.armColor1 : target.armColor2));
+
+        nebulaPuffs.push({
+          x, y, z,
+          radius: i < 10 ? 128 : (64 + Math.random() * 98),
+          sprite: getOrganicNebulaSprite(col[0], col[1], col[2], i % 6, false),
+          alpha: i < 10 ? 0.34 : 0.16,
+          rotation: Math.random() * Math.PI * 2
+        });
+      }
+
+      // 3. Build Dark Molecular Dust Lanes (Crucial for National Geographic / Hubble contrast!)
+      const dustCount = target.type === 'blackhole' ? 16 : 38;
+      for (let i = 0; i < dustCount; i++) {
+        const rad = 38 + (i / dustCount) * 285;
+        const armIdx = i % target.arms;
+        const winding = (rad / 340) * Math.PI * (target.type === 'grand-spiral' ? 3.55 : 2.95);
+        // Slightly inside the leading edge of each spiral arm where real shock-front dust lanes form
+        const angle = (armIdx * Math.PI * 2) / target.arms + winding - 0.16 + (Math.random() - 0.5) * 0.15;
+        const x = Math.cos(angle) * rad;
+        const z = Math.sin(angle) * rad;
+        const y = (Math.random() - 0.5) * (target.type === 'nebula-cluster' ? 65 : 10);
+        const dc = target.darkLaneColor || [6, 8, 18];
+
+        darkDustLanes.push({
+          x, y, z,
+          radius: 46 + Math.random() * 68,
+          sprite: getOrganicNebulaSprite(dc[0], dc[1], dc[2], i % 5, true),
+          alpha: target.type === 'nebula-cluster' ? 0.72 : 0.62
+        });
+      }
+    }
+
+    function init3DUniverse() {
+      stars3D = [];
+      deepFieldGalaxies = [];
+      const spread = 2600;
+
+      // 1. 2,400 Multi-Magnitude Pinpoint & JWST Diffraction Stars
+      for (let i = 0; i < STAR_COUNT; i++) {
+        const x = (Math.random() - 0.5) * spread;
+        const y = (Math.random() - 0.5) * spread;
+        const z = Math.random() * flight.maxDepth + 1;
+        const spec = STAR_SPECTRA[Math.floor(Math.pow(Math.random(), 1.35) * STAR_SPECTRA.length)];
+        const isHeroStar = Math.random() < 0.028;
+        const sprite = getGlowingStarSprite(spec[0], spec[1], spec[2], isHeroStar);
+
+        stars3D.push({
+          x, y, z,
+          r: spec[0], g: spec[1], b: spec[2],
+          baseSize: isHeroStar ? (2.2 + Math.random() * 1.6) : (0.45 + Math.pow(Math.random(), 1.8) * 1.25),
+          isHeroStar,
+          sprite,
+          twinklePhase: Math.random() * Math.PI * 2
+        });
+      }
+
+      // 2. 45 Distant Deep-Field Background Galaxies (JWST Deep Field Aesthetic)
+      for (let i = 0; i < 45; i++) {
+        const spec = STAR_SPECTRA[3 + (i % 4)];
+        deepFieldGalaxies.push({
+          x: (Math.random() - 0.5) * 2800,
+          y: (Math.random() - 0.5) * 2200,
+          z: 900 + Math.random() * 1300,
+          rx: 8 + Math.random() * 16,
+          ry: 3 + Math.random() * 6,
+          angle: Math.random() * Math.PI,
+          r: spec[0], g: spec[1], b: spec[2],
+          alpha: 0.18 + Math.random() * 0.28
+        });
+      }
+
+      buildGalaxyGeometry(flight.targetIndex);
+    }
+
+    function updateNebulaColors(pal) {
+      nebulaSpriteCache.clear();
+      COSMIC_TARGETS[0].armColor2 = pal.nebulaCore;
+      COSMIC_TARGETS[0].armColor1 = pal.nebulaMid;
+      if (flight.targetIndex === 0) {
+        buildGalaxyGeometry(0);
+      }
+    }
+
+    function resizeCosmosCanvas() {
+      flight.width = window.innerWidth;
+      flight.height = window.innerHeight;
+      flight.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = flight.width * flight.dpr;
+      canvas.height = flight.height * flight.dpr;
+      ctx.setTransform(flight.dpr, 0, 0, flight.dpr, 0, 0);
+    }
+
+    // Continuous Speed Slider Handler (Ползунок скорости без научных терминов)
+    function updateFlightSpeedFromSlider(val) {
+      const num = parseFloat(val);
+      flight.sliderSpeed = isNaN(num) ? 1.2 : num;
+      const readout = document.getElementById('hud-speed-readout');
+      if (readout) {
+        if (flight.sliderSpeed === 0) readout.textContent = 'Пауза';
+        else if (flight.sliderSpeed < 1.5) readout.textContent = 'Плавно';
+        else if (flight.sliderSpeed < 3.2) readout.textContent = 'Поток';
+        else readout.textContent = 'Вихрь';
+      }
+      updateHudTelemetryText();
+    }
+
+    function updateGalaxyZoomFromSlider(val) {
+      const dist = parseFloat(val);
+      flight.galaxyDist = isNaN(dist) ? 640 : dist;
+      flight.orbitRadius = flight.galaxyDist;
+      const readout = document.getElementById('hud-zoom-readout');
+      if (readout) readout.textContent = `${Math.round(flight.galaxyDist)} пк`;
+    }
+
+    function updateGalaxyXFromSlider(val) {
+      flight.userOffsetX = parseFloat(val) || 0;
+      const readout = document.getElementById('hud-x-readout');
+      if (readout) readout.textContent = `${flight.userOffsetX > 0 ? '+' : ''}${flight.userOffsetX} пк`;
+    }
+
+    function updateGalaxyYFromSlider(val) {
+      flight.userOffsetY = parseFloat(val) || 0;
+      const readout = document.getElementById('hud-y-readout');
+      if (readout) readout.textContent = `${flight.userOffsetY > 0 ? '+' : ''}${flight.userOffsetY} пк`;
+    }
+
+    function toggleOrbitLock() {
+      flight.lockOrbit = !flight.lockOrbit;
+      const btn = document.getElementById('orbit-lock-btn');
+      if (btn) {
+        btn.textContent = flight.lockOrbit ? '⟳ Кружение' : '⟳ Свободно';
+        btn.className = flight.lockOrbit
+          ? 'px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/15 bg-white/10 text-accent-1 hover:bg-white/20 transition-all'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/10 bg-transparent text-slate-400 hover:text-white transition-all';
+      }
+    }
+
+    function toggleZoomOut() {
+      flight.isZoomedOut = !flight.isZoomedOut;
+      flight.orbitRadius = flight.isZoomedOut ? flight.zoomOutDist : flight.normalOrbitRadius;
+      if (flight.state === 'ORBIT') {
+        flight.galaxyDist = flight.orbitRadius;
+      }
+      const btn = document.getElementById('zoom-out-btn');
+      if (btn) {
+        btn.textContent = flight.isZoomedOut ? '⊕ Приближение' : '⊖ Отдаление';
+        btn.className = flight.isZoomedOut
+          ? 'px-2 py-0.5 rounded-md text-[10px] font-mono border border-accent bg-white/20 text-accent-1 transition-all'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/15 bg-white/5 text-slate-300 hover:bg-white/15 transition-all';
+      }
+    }
+
+    function selectCosmicTarget(idx) {
+      flight.targetIndex = idx;
+      flight.state = 'APPROACH';
+      flight.galaxyDist = 640;
+      flight.userOffsetX = 0;
+      flight.userOffsetY = 0;
+      flight.orbitProgress = 0;
+
+      const zoomSlider = document.getElementById('galaxy-zoom-slider');
+      if (zoomSlider) zoomSlider.value = 640;
+      const xSlider = document.getElementById('galaxy-x-slider');
+      if (xSlider) xSlider.value = 0;
+      const ySlider = document.getElementById('galaxy-y-slider');
+      if (ySlider) ySlider.value = 0;
+
+      const zoomReadout = document.getElementById('hud-zoom-readout');
+      if (zoomReadout) zoomReadout.textContent = '640 пк';
+      const xReadout = document.getElementById('hud-x-readout');
+      if (xReadout) xReadout.textContent = '0 пк';
+      const yReadout = document.getElementById('hud-y-readout');
+      if (yReadout) yReadout.textContent = '0 пк';
+
+      buildGalaxyGeometry(idx);
+
+      for (let i = 0; i < 4; i++) {
+        const pill = document.getElementById(`target-pill-${i}`);
+        if (!pill) continue;
+        if (i === idx) {
+          pill.className = 'px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all bg-white/15 text-white border border-white/25';
+        } else {
+          pill.className = 'px-1.5 py-1 rounded-lg text-[10px] font-mono truncate transition-all text-slate-400 hover:text-white border border-transparent';
+        }
+      }
+      updateHudTelemetryText();
+    }
+
+    const MYSTIC_REALM_NAMES = ['ЗВЁЗДНАЯ СПИРАЛЬ', 'ВИХРЬ СУДЬБЫ', 'ЧЁРНОЕ СОЛНЦЕ', 'ЭФИР ДУШИ'];
+
+    function updateHudTelemetryText() {
+      const el = document.getElementById('hud-flight-state');
+      if (!el) return;
+      const realmName = MYSTIC_REALM_NAMES[flight.targetIndex] || 'ГЛУБОКИЙ КОСМОС';
+      if (flight.sliderSpeed === 0) {
+        el.textContent = `ТИШИНА ВСЕЛЕННОЙ • ${realmName}`;
+      } else {
+        el.textContent = `ДЫХАНИЕ ВСЕЛЕННОЙ • ${realmName}`;
+      }
+    }
+
+    function togglePureSpace() {
+      document.body.classList.toggle('pure-space');
+      const isPure = document.body.classList.contains('pure-space');
+      const label = document.getElementById('pure-space-label');
+      if (label) label.textContent = isPure ? 'Вернуть меню' : 'Чистое небо';
+    }
+
+    // Main 3D Galaxy & Space Flight Loop
+    function renderCosmosLoop(now) {
+      const w = flight.width;
+      const h = flight.height;
+      const t = now * 0.001;
+
+      // Smooth spring damping for mouse steering
+      flight.steerX += (flight.targetSteerX - flight.steerX) * 0.05;
+      flight.steerY += (flight.targetSteerY - flight.steerY) * 0.05;
+      flight.scrollBoost *= 0.92;
+
+      const effectiveSpeed = flight.sliderSpeed + flight.scrollBoost * 0.25;
+      const targetObj = COSMIC_TARGETS[flight.targetIndex];
+
+      // ===================================================================
+      // AUTOPILOT STATE MACHINE: APPROACH -> DECELERATE -> 360° ORBIT
+      // ===================================================================
+      let starForwardSpeed = effectiveSpeed * 2.1;
+
+      if (flight.state === 'APPROACH') {
+        const remaining = flight.galaxyDist - flight.orbitRadius;
+        const approachStep = Math.max(0.8, remaining * 0.032) * (effectiveSpeed * 0.85);
+        flight.galaxyDist -= approachStep;
+        flight.orbitAzimuth += 0.0025 * effectiveSpeed;
+        starForwardSpeed = effectiveSpeed * 3.4;
+
+        if (flight.galaxyDist <= flight.orbitRadius + 6) {
+          flight.galaxyDist = flight.orbitRadius;
+          flight.state = 'ORBIT';
+          updateHudTelemetryText();
+        }
+      } else if (flight.state === 'ORBIT') {
+        const angularVel = 0.0046 * effectiveSpeed;
+        flight.orbitAzimuth += angularVel;
+        flight.orbitProgress += angularVel;
+        flight.galaxyDist = flight.orbitRadius + Math.sin(t * 0.55) * 22;
+        starForwardSpeed = effectiveSpeed * 0.82;
+
+        if (!flight.lockOrbit && flight.orbitProgress > Math.PI * 2.1) {
+          const nextIdx = (flight.targetIndex + 1) % COSMIC_TARGETS.length;
+          selectCosmicTarget(nextIdx);
+        }
+      }
+
+      // Camera Center & Vanishing Point
+      const vpX = w * 0.5 - flight.steerX * (w * 0.14);
+      const vpY = h * 0.5 - flight.steerY * (h * 0.14);
+
+      // 1. Deep Space Velvet Background with Subtle Cosmic Dust Ambience
+      ctx.fillStyle = PALETTES[activePaletteKey].bgDeep;
+      ctx.fillRect(0, 0, w, h);
+
+      const galCenterX = vpX + flight.userOffsetX + Math.sin(t * 0.35) * 16;
+      const galCenterY = vpY + flight.userOffsetY - h * 0.03;
+
+      // Ambient wide-field galactic glow (National Geographic long-exposure sky glow)
+      const bgGlowRadius = Math.max(w, h) * 0.62;
+      const bgGlow = ctx.createRadialGradient(galCenterX, galCenterY, 0, galCenterX, galCenterY, bgGlowRadius);
+      bgGlow.addColorStop(0, `rgba(${targetObj.armColor1[0]}, ${targetObj.armColor1[1]}, ${targetObj.armColor1[2]}, 0.09)`);
+      bgGlow.addColorStop(0.45, `rgba(${targetObj.dustColor[0]}, ${targetObj.dustColor[1]}, ${targetObj.dustColor[2]}, 0.04)`);
+      bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = bgGlow;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Render Distant JWST Deep-Field Background Mini-Galaxies
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      for (let i = 0; i < deepFieldGalaxies.length; i++) {
+        const dg = deepFieldGalaxies[i];
+        dg.z -= starForwardSpeed * 0.25;
+        if (dg.z <= 200) dg.z = 2200;
+
+        const sc = flight.focalLength / dg.z;
+        const sx = vpX + dg.x * sc;
+        const sy = vpY + dg.y * sc;
+        if (sx < -40 || sx > w + 40 || sy < -40 || sy > h + 40) continue;
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(dg.angle);
+        const rx = dg.rx * sc * 1.8;
+        const ry = dg.ry * sc * 1.8;
+        const gGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gGrad.addColorStop(0, `rgba(255, 250, 240, ${dg.alpha})`);
+        gGrad.addColorStop(0.45, `rgba(${dg.r}, ${dg.g}, ${dg.b}, ${dg.alpha * 0.45})`);
+        gGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = gGrad;
+        ctx.scale(1, ry / Math.max(1, rx));
+        ctx.beginPath();
+        ctx.arc(0, 0, rx, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 3. Render Passing Interstellar 3D Starfield (Pinpoint + JWST 8-Spike Stars)
+      const warpStreak = Math.max(0, (starForwardSpeed - 2.6) * 2.5);
+      for (let i = 0; i < stars3D.length; i++) {
+        const s = stars3D[i];
+        s.z -= starForwardSpeed;
+        s.x -= (flight.steerX * 1.6 + (flight.state === 'ORBIT' ? 1.5 : 0.4)) * effectiveSpeed;
+        s.y -= flight.steerY * 1.4 * effectiveSpeed;
+
+        if (s.z <= 5) {
+          s.z = flight.maxDepth;
+          s.x = (Math.random() - 0.5) * 2600;
+          s.y = (Math.random() - 0.5) * 2600;
+        }
+        if (s.x > 1300) s.x -= 2600;
+        if (s.x < -1300) s.x += 2600;
+        if (s.y > 1300) s.y -= 2600;
+        if (s.y < -1300) s.y += 2600;
+
+        const scale = flight.focalLength / s.z;
+        const sx = vpX + s.x * scale;
+        const sy = vpY + s.y * scale;
+        if (sx < -45 || sx > w + 45 || sy < -45 || sy > h + 45) continue;
+
+        const depthAlpha = Math.min(1, (flight.maxDepth - s.z) / 380);
+        const twinkle = 0.82 + 0.18 * Math.sin(t * 2.4 + s.twinklePhase);
+        const alpha = depthAlpha * twinkle;
+        const radius = Math.min(5.2, s.baseSize * scale * 1.32);
+
+        if (warpStreak > 0.5) {
+          const prevScale = flight.focalLength / (s.z + starForwardSpeed * 2.4);
+          const px = vpX + (sx - vpX) * (prevScale / scale);
+          const py = vpY + (sy - vpY) * (prevScale / scale);
+          ctx.globalAlpha = alpha * 0.5;
+          ctx.strokeStyle = `rgb(${s.r}, ${s.g}, ${s.b})`;
+          ctx.lineWidth = Math.max(0.5, radius * 0.4);
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(px, py);
+          ctx.stroke();
+        }
+
+        const drawDiam = radius * (s.isHeroStar ? 9.5 : 3.8);
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(s.sprite, sx - drawDiam * 0.5, sy - drawDiam * 0.5, drawDiam, drawDiam);
+      }
+      ctx.restore();
+
+      // 4. Render Photorealistic 3D Galaxy / Nebula / Black Hole
+      const yaw = flight.orbitAzimuth + flight.steerX * 0.65;
+      const pitch = targetObj.tiltX + Math.sin(flight.orbitAzimuth * 0.5) * 0.2 + flight.steerY * 0.48;
+
+      const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
+      const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+
+      // 4A. Volumetric Organic Gas Nebulae (Filamentous Sprites)
+      for (let i = 0; i < nebulaPuffs.length; i++) {
+        const np = nebulaPuffs[i];
+        const x1 = np.x * cosY - np.z * sinY;
+        const z1 = np.x * sinY + np.z * cosY;
+        const y2 = np.y * cosP - z1 * sinP;
+        const z2 = np.y * sinP + z1 * cosP + flight.galaxyDist;
+
+        if (z2 <= 40) continue;
+        const sc = flight.focalLength / z2;
+        const sx = galCenterX + x1 * sc;
+        const sy = galCenterY + y2 * sc;
+        const sr = np.radius * sc * 1.45;
+
+        if (sx + sr < 0 || sx - sr > w || sy + sr < 0 || sy - sr > h) continue;
+
+        ctx.globalAlpha = np.alpha;
+        ctx.drawImage(np.sprite, sx - sr, sy - sr, sr * 2, sr * 2);
+      }
+
+      // 4B. Dark Molecular Absorption Dust Lanes (Carves realistic Hubble/JWST depth & contrast!)
+      ctx.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < darkDustLanes.length; i++) {
+        const dl = darkDustLanes[i];
+        const x1 = dl.x * cosY - dl.z * sinY;
+        const z1 = dl.x * sinY + dl.z * cosY;
+        const y2 = dl.y * cosP - z1 * sinP;
+        const z2 = dl.y * sinP + z1 * cosP + flight.galaxyDist;
+
+        if (z2 <= 45) continue;
+        const sc = flight.focalLength / z2;
+        const sx = galCenterX + x1 * sc;
+        const sy = galCenterY + y2 * sc;
+        const sr = dl.radius * sc * 1.35;
+
+        if (sx + sr < 0 || sx - sr > w || sy + sr < 0 || sy - sr > h) continue;
+
+        ctx.globalAlpha = dl.alpha;
+        ctx.drawImage(dl.sprite, sx - sr, sy - sr, sr * 2, sr * 2);
+      }
+
+      // 4C. Central Galactic Nucleus / Relativistic Black Hole Lensing
+      ctx.globalCompositeOperation = 'screen';
+      const coreDistScale = flight.focalLength / Math.max(60, flight.galaxyDist);
+
+      if (targetObj.type === 'blackhole') {
+        const shadowR = 38 * coreDistScale;
+
+        // Gravitational Lensed Upper & Lower Relativistic Halo Arch
+        const archGrad = ctx.createRadialGradient(galCenterX, galCenterY, shadowR * 0.9, galCenterX, galCenterY, shadowR * 2.9);
+        archGrad.addColorStop(0, 'rgba(255, 248, 225, 0.98)');
+        archGrad.addColorStop(0.18, 'rgba(255, 195, 110, 0.82)');
+        archGrad.addColorStop(0.45, 'rgba(235, 88, 45, 0.35)');
+        archGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = archGrad;
+        ctx.beginPath();
+        ctx.arc(galCenterX, galCenterY, shadowR * 2.9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Event Horizon Shadow
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#010103';
+        ctx.beginPath();
+        ctx.arc(galCenterX, galCenterY, shadowR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Crisp Photon Ring
+        ctx.strokeStyle = 'rgba(255, 238, 195, 0.85)';
+        ctx.lineWidth = Math.max(1, 1.8 * coreDistScale);
+        ctx.beginPath();
+        ctx.arc(galCenterX, galCenterY, shadowR * 1.04, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalCompositeOperation = 'screen';
+      } else {
+        // Multi-stage Galactic Bulge Glow (Incandescent core + warm golden halo)
+        const coreHaloR = 165 * coreDistScale;
+        const coreGrad = ctx.createRadialGradient(galCenterX, galCenterY, 0, galCenterX, galCenterY, coreHaloR);
+        coreGrad.addColorStop(0, 'rgba(255, 254, 248, 0.92)');
+        coreGrad.addColorStop(0.14, `rgba(${targetObj.coreColor[0]}, ${targetObj.coreColor[1]}, ${targetObj.coreColor[2]}, 0.65)`);
+        coreGrad.addColorStop(0.42, `rgba(${targetObj.armColor2[0]}, ${targetObj.armColor2[1]}, ${targetObj.armColor2[2]}, 0.22)`);
+        coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(galCenterX, galCenterY, coreHaloR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 4D. Draw 3,600 3D Galaxy Stars & H-II Star-Forming Jewels
+      for (let i = 0; i < galaxyParticles.length; i++) {
+        const gp = galaxyParticles[i];
+
+        const x1 = gp.x * cosY - gp.z * sinY;
+        const z1 = gp.x * sinY + gp.z * cosY;
+        const y2 = gp.y * cosP - z1 * sinP;
+        const z2 = gp.y * sinP + z1 * cosP + flight.galaxyDist;
+
+        if (z2 <= 30) continue;
+        const sc = flight.focalLength / z2;
+        const sx = galCenterX + x1 * sc;
+        const sy = galCenterY + y2 * sc;
+
+        if (sx < -36 || sx > w + 36 || sy < -36 || sy > h + 36) continue;
+
+        const pr = Math.min(5.5, gp.size * sc);
+        const shimmer = 0.84 + 0.16 * Math.sin(t * gp.twinkleSpeed + gp.twinklePhase);
+        const spriteDiam = pr * (gp.hasSpikes ? 9.2 : (gp.isHII ? 5.2 : 3.6));
+
+        ctx.globalAlpha = Math.min(1, gp.alpha * shimmer);
+        ctx.drawImage(gp.sprite, sx - spriteDiam * 0.5, sy - spriteDiam * 0.5, spriteDiam, spriteDiam);
+      }
+
+      ctx.restore();
+      requestAnimationFrame(renderCosmosLoop);
+    }
+
+    // Mouse & Touch Steering Listeners + Card Spotlight Effect
+    window.addEventListener('mousemove', (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      flight.targetSteerX = nx;
+      flight.targetSteerY = ny;
+
+      const gyro = document.getElementById('hero-gyro-svg');
+      if (gyro) {
+        gyro.style.transform = `perspective(900px) rotateY(${nx * 14}deg) rotateX(${-ny * 14}deg)`;
+      }
+
+      document.querySelectorAll('.mystic-card').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (e.clientY >= rect.top - 100 && e.clientY <= rect.bottom + 100) {
+          card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+          card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+        }
+      });
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1) {
+        const nx = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+        const ny = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
+        flight.targetSteerX = nx;
+        flight.targetSteerY = ny;
+      }
+    }, { passive: true });
+
+    /*************************************************************************
+     * 3. VIEWPORT-PINNED SCROLLYTELLING STABILIZATION ENGINE
+     *************************************************************************/
+    let lastScrollY = window.scrollY;
+
+    function updatePinnedEcosystemOnScroll() {
+      const track = document.getElementById('features-scroll-track');
+      if (!track || window.innerWidth < 1024) return;
+
+      const rect = track.getBoundingClientRect();
+      const scrollableDistance = rect.height - window.innerHeight;
+      if (scrollableDistance <= 0) return;
+
+      // Raw progress 0.0 -> 1.0 ONLY after the sticky container hits the top of the viewport (rect.top <= 0)
+      const rawProgress = Math.max(0, Math.min(1, -rect.top / scrollableDistance));
+
+      // Update visual scroll progress bar
+      const bar = document.getElementById('ecosystem-scroll-bar');
+      if (bar) {
+        bar.style.width = `${Math.max(8, Math.round(rawProgress * 100))}%`;
+      }
+
+      // Stabilization Deadzone Buffer:
+      // 0.00 -> 0.14 : Hold firmly on Stage 0 so the section locks and stabilizes first
+      // 0.14 -> 0.86 : Smoothly step through Stages 0 -> 1 -> 2 -> 3 -> 4
+      // 0.86 -> 1.00 : Hold firmly on Stage 4 before releasing sticky lock
+      let targetStep = 0;
+
+      if (rawProgress <= 0.14) {
+        targetStep = 0;
+      } else if (rawProgress >= 0.86) {
+        targetStep = 4;
+      } else {
+        const normalized = (rawProgress - 0.14) / (0.86 - 0.14);
+        targetStep = Math.min(4, Math.floor(normalized * 5));
+      }
+
+      const lockBadge = document.getElementById('scroll-lock-badge');
+      if (lockBadge) {
+        lockBadge.textContent = `Грань 0${targetStep + 1} из 05`;
+      }
+
+      if (targetStep !== currentEcoStep) {
+        activateEcoStep(targetStep);
+      }
+    }
+
+    // Smoothly scroll to the exact stabilized checkpoint when clicking any of the 5 cards
+    function scrollToEcoStep(stepIdx) {
+      activateEcoStep(stepIdx);
+      const track = document.getElementById('features-scroll-track');
+      if (!track || window.innerWidth < 1024) return;
+
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      const scrollableDistance = track.offsetHeight - window.innerHeight;
+      // Map step 0..4 into the stabilized 0.14..0.86 window
+      const targetProgress = 0.14 + ((stepIdx + 0.45) / 5) * (0.86 - 0.14);
+      const targetScrollY = trackTop + scrollableDistance * targetProgress;
+
+      window.scrollTo({
+        top: targetScrollY,
+        behavior: 'smooth'
+      });
+    }
+
+    window.addEventListener('scroll', () => {
+      const currentY = window.scrollY;
+      const delta = Math.abs(currentY - lastScrollY);
+      lastScrollY = currentY;
+
+      // Subtle boost to space flight on scroll
+      flight.scrollBoost = Math.min(10, flight.scrollBoost + delta * 0.04);
+
+      // Update Viewport-Pinned Scrollytelling Section
+      updatePinnedEcosystemOnScroll();
+    }, { passive: true });
+
+    /*************************************************************************
+     * 4. HERO 3D CELESTIAL GYROSCOPE ORB & SCROLLYTELLING MORPH STAGE
+     *************************************************************************/
+    let heroOrbMode = 0;
+    const ZODIAC_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+
+    function renderHeroGyroscope() {
+      const svg = document.getElementById('hero-gyro-svg');
+      if (!svg) return;
+      const p = PALETTES[activePaletteKey];
+      const cx = 250, cy = 250;
+
+      let zodiacMarkup = '';
+      for (let i = 0; i < 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        const x = cx + Math.cos(a) * 192;
+        const y = cy + Math.sin(a) * 192;
+        zodiacMarkup += `
+          <text x="${x}" y="${y}" fill="${p.accentSoft}" font-size="14" text-anchor="middle" dominant-baseline="central" opacity="0.9">
+            ${ZODIAC_GLYPHS[i]}
+          </text>
+        `;
+      }
+
+      let starLines = '';
+      for (let i = 0; i < 8; i++) {
+        const a1 = (i * 45) * Math.PI / 180;
+        const a2 = ((i + 3) * 45) * Math.PI / 180;
+        starLines += `<line x1="${cx + Math.cos(a1)*115}" y1="${cy + Math.sin(a1)*115}" x2="${cx + Math.cos(a2)*115}" y2="${cy + Math.sin(a2)*115}" stroke="${p.accent1}" stroke-width="0.9" stroke-opacity="0.45" />`;
+      }
+
+      svg.innerHTML = `
+        <defs>
+          <radialGradient id="orbCoreGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${p.accent1}" stop-opacity="0.35"/>
+            <stop offset="55%" stop-color="${p.accent2}" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="${p.bgDeep}" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <circle cx="${cx}" cy="${cy}" r="225" fill="url(#orbCoreGrad)" />
+        <circle cx="${cx}" cy="${cy}" r="215" fill="none" stroke="${p.accent1}" stroke-opacity="0.35" stroke-width="1" />
+        <circle cx="${cx}" cy="${cy}" r="170" fill="none" stroke="${p.accent2}" stroke-opacity="0.28" stroke-width="1" stroke-dasharray="4 6" class="anim-spin-ccw" />
+
+        <g>
+          <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="36s" repeatCount="indefinite"/>
+          <ellipse cx="${cx}" cy="${cy}" rx="205" ry="72" transform="rotate(-28 250 250)" fill="none" stroke="${p.accent1}" stroke-width="1.2" stroke-opacity="0.55" />
+          <ellipse cx="${cx}" cy="${cy}" rx="205" ry="72" transform="rotate(42 250 250)" fill="none" stroke="${p.accent2}" stroke-width="1.1" stroke-opacity="0.45" />
+          ${zodiacMarkup}
+        </g>
+
+        <g>
+          <animateTransform attributeName="transform" type="rotate" from="360 250 250" to="0 250 250" dur="24s" repeatCount="indefinite"/>
+          ${starLines}
+          <circle cx="${cx}" cy="${cy}" r="115" fill="none" stroke="${p.accentSoft}" stroke-opacity="0.25" stroke-width="0.9" />
+        </g>
+
+        <circle cx="${cx}" cy="${cy}" r="28" fill="${p.bgDeep}" stroke="${p.accent1}" stroke-width="1.6" />
+        <path d="M250 232 L254 246 L268 250 L254 254 L250 268 L246 254 L232 250 L246 246 Z" fill="${p.accentSoft}" class="anim-pulse-node"/>
+      `;
+    }
+
+    function cycleHeroOrbMode() {
+      heroOrbMode = (heroOrbMode + 1) % 3;
+      selectCosmicTarget((flight.targetIndex + 1) % COSMIC_TARGETS.length);
+      const captions = [
+        'Знак Вселенной: Доверься своей интуиции • Нажми ещё раз',
+        'Знак Вселенной: Время открывать новые двери • Нажми ещё раз',
+        'Колесо Судьбы • Поверни и узнай свой знак'
+      ];
+      document.getElementById('hero-orb-caption').textContent = captions[heroOrbMode];
+      renderHeroGyroscope();
+    }
+
+    let currentEcoStep = 0;
+
+    const ECO_STAGES = [
+      {
+        badge: 'ИЗМЕРЕНИЕ 01 // НАТАЛЬНАЯ КАРТА',
+        title: 'Космический отпечаток личности',
+        footer: '12 домов, планеты и точные аспекты показывают твой истинный потенциал.'
+      },
+      {
+        badge: 'ИЗМЕРЕНИЕ 02 // МАТРИЦА СУДЬБЫ',
+        title: 'Октаграмма 22 старших энергий',
+        footer: 'Расшифровка денежного канала, предназначения и кармических узлов.'
+      },
+      {
+        badge: 'ИЗМЕРЕНИЕ 03 // ТАРО И AI-ОРАКУЛ',
+        title: 'Живой диалог с подсознанием',
+        footer: 'Глубокие расклады на выбор пути, отношения и карьеру в один клик.'
+      },
+      {
+        badge: 'ИЗМЕРЕНИЕ 04 // СИНАСТРИЯ ПАРЫ',
+        title: 'Гравитация и резонанс двух душ',
+        footer: 'Точный расчёт совместимости по датам рождения для любви и бизнеса.'
+      },
+      {
+        badge: 'ИЗМЕРЕНИЕ 05 // ЛУННЫЙ НАВИГАТОР',
+        title: 'Ежедневный пульс твоей энергии',
+        footer: 'Личный календарь благоприятных окон и периодов восстановления.'
+      }
+    ];
+
+    function activateEcoStep(idx) {
+      currentEcoStep = idx;
+      document.querySelectorAll('.eco-step').forEach((el, i) => {
+        el.classList.toggle('active-step', i === idx);
+      });
+      for (let i = 0; i < 5; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (dot) dot.className = i === idx ? 'w-5 h-2.5 rounded-full bg-white transition-all' : 'w-2.5 h-2.5 rounded-full bg-white/20 transition-all';
+      }
+
+      const st = ECO_STAGES[idx];
+      document.getElementById('morph-stage-badge').textContent = st.badge;
+      document.getElementById('morph-stage-title').textContent = st.title;
+      document.getElementById('morph-stage-footer').textContent = st.footer;
+
+      renderMorphStage(idx);
+    }
+
+    function renderMorphStage(idx) {
+      const svg = document.getElementById('morph-visualizer-svg');
+      if (!svg) return;
+      const p = PALETTES[activePaletteKey];
+      const cx = 200, cy = 200;
+
+      if (idx === 0) {
+        // Animated Stage 0: Counter-rotating Natal Wheel + Flowing Aspect Lines
+        let nodes = '';
+        const angles = [20, 75, 135, 195, 250, 315];
+        angles.forEach((deg, i) => {
+          const r = (deg - 90) * Math.PI / 180;
+          const x = cx + Math.cos(r) * 135;
+          const y = cy + Math.sin(r) * 135;
+          const nextR = (angles[(i + 2) % angles.length] - 90) * Math.PI / 180;
+          const nx = cx + Math.cos(nextR) * 135;
+          const ny = cy + Math.sin(nextR) * 135;
+          nodes += `
+            <line x1="${x}" y1="${y}" x2="${nx}" y2="${ny}" stroke="${p.accent1}" stroke-width="1.2" stroke-opacity="0.6" class="anim-dash-flow" />
+            <circle cx="${x}" cy="${y}" r="12" fill="${p.bgDeep}" stroke="${p.accent1}" stroke-width="1.6" />
+            <text x="${x}" y="${y}" fill="#fff" font-size="11" text-anchor="middle" dominant-baseline="central">${['☉','☽','♀','♂','♃','♄'][i]}</text>
+          `;
+        });
+        svg.innerHTML = `
+          <circle cx="${cx}" cy="${cy}" r="172" fill="none" stroke="${p.accent1}" stroke-opacity="0.4" stroke-width="1.2" stroke-dasharray="6 4" class="anim-spin-ccw" />
+          <g class="anim-spin-cw">
+            <circle cx="${cx}" cy="${cy}" r="135" fill="none" stroke="${p.accent2}" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="4 4" />
+            ${nodes}
+          </g>
+          <circle cx="${cx}" cy="${cy}" r="26" fill="${p.accent1}" fill-opacity="0.18" stroke="${p.accent1}" stroke-width="1.4" class="anim-pulse-node"/>
+          <text x="${cx}" y="${cy}" fill="${p.accentSoft}" font-size="14" font-family="JetBrains Mono" text-anchor="middle" dominant-baseline="central">ASC</text>
+        `;
+      } else if (idx === 1) {
+        // Animated Stage 1: Breathing Matrix of Destiny Octagram
+        const nums = [5, 19, 8, 11, 15, 7, 21, 10];
+        let octNodes = '';
+        for (let i = 0; i < 8; i++) {
+          const a = (i * 45 - 90) * Math.PI / 180;
+          const x = cx + Math.cos(a) * 145;
+          const y = cy + Math.sin(a) * 145;
+          octNodes += `
+            <line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${p.accent1}" stroke-opacity="0.35" stroke-width="1.1" class="anim-dash-flow" />
+            <circle cx="${x}" cy="${y}" r="16" fill="${p.bgDeep}" stroke="${p.accent1}" stroke-width="1.6" />
+            <text x="${x}" y="${y}" fill="#fff" font-size="11" font-family="JetBrains Mono" text-anchor="middle" dominant-baseline="central">${nums[i]}</text>
+          `;
+        }
+        svg.innerHTML = `
+          <rect x="98" y="98" width="204" height="204" fill="none" stroke="${p.accent1}" stroke-width="1.4" stroke-opacity="0.6" class="anim-spin-cw" />
+          <rect x="98" y="98" width="204" height="204" transform="rotate(45 200 200)" fill="none" stroke="${p.accent2}" stroke-width="1.4" stroke-opacity="0.6" class="anim-spin-ccw" />
+          ${octNodes}
+          <circle cx="${cx}" cy="${cy}" r="28" fill="${p.bgDeep}" stroke="${p.accentSoft}" stroke-width="2" class="anim-pulse-node" />
+          <text x="${cx}" y="${cy}" fill="${p.accent1}" font-size="16" font-family="JetBrains Mono" font-weight="600" text-anchor="middle" dominant-baseline="central">IX</text>
+        `;
+      } else if (idx === 2) {
+        // Animated Stage 2: Fanning Holographic Tarot Deck
+        svg.innerHTML = `
+          <g class="anim-tarot-left">
+            <rect x="140" y="70" width="120" height="195" rx="12" fill="${p.bgDeep}" stroke="${p.accent2}" stroke-width="1.4" />
+            <circle cx="200" cy="165" r="26" fill="none" stroke="${p.accent2}" stroke-opacity="0.4" stroke-dasharray="3 3" class="anim-spin-cw"/>
+          </g>
+          <g class="anim-tarot-right">
+            <rect x="140" y="70" width="120" height="195" rx="12" fill="${p.bgDeep}" stroke="${p.accent2}" stroke-width="1.4" />
+            <circle cx="200" cy="165" r="26" fill="none" stroke="${p.accent2}" stroke-opacity="0.4" stroke-dasharray="3 3" class="anim-spin-ccw"/>
+          </g>
+          <g class="anim-float">
+            <rect x="135" y="55" width="130" height="210" rx="14" fill="#0B1020" stroke="${p.accent1}" stroke-width="2" />
+            <circle cx="200" cy="145" r="38" fill="none" stroke="${p.accent1}" stroke-opacity="0.55" stroke-dasharray="4 3" class="anim-spin-cw" />
+            <path d="M200 118 L206 139 L227 145 L206 151 L200 172 L194 151 L173 145 L194 139 Z" fill="${p.accentSoft}" class="anim-pulse-node"/>
+            <text x="200" y="235" fill="#fff" font-size="12" font-family="Cormorant Garamond" letter-spacing="2" text-anchor="middle">THE STAR • XVII</text>
+          </g>
+        `;
+      } else if (idx === 3) {
+        // Animated Stage 3: Binary Synastry Orbits Revolving
+        svg.innerHTML = `
+          <g class="anim-spin-cw">
+            <circle cx="158" cy="200" r="92" fill="${p.accent1}" fill-opacity="0.08" stroke="${p.accent1}" stroke-width="1.5" stroke-dasharray="8 4" />
+            <circle cx="158" cy="108" r="7" fill="${p.accent1}" />
+          </g>
+          <g class="anim-spin-ccw">
+            <circle cx="242" cy="200" r="92" fill="${p.accent2}" fill-opacity="0.08" stroke="${p.accent2}" stroke-width="1.5" stroke-dasharray="8 4" />
+            <circle cx="242" cy="292" r="7" fill="${p.accent2}" />
+          </g>
+          <path d="M 200 122 Q 235 200 200 278 Q 165 200 200 122" fill="${p.accent1}" fill-opacity="0.22" stroke="${p.accentSoft}" stroke-width="1.4" class="anim-pulse-node" />
+          <circle cx="200" cy="200" r="6" fill="#fff" class="anim-pulse-node"/>
+        `;
+      } else {
+        // Animated Stage 4: Lunar Phases & Flowing Tidal Sine Waves
+        svg.innerHTML = `
+          <circle cx="200" cy="160" r="88" fill="none" stroke="${p.accent1}" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="4 6" class="anim-spin-cw" />
+          <circle cx="200" cy="160" r="68" fill="${p.accent1}" fill-opacity="0.14" stroke="${p.accent1}" stroke-width="1.5" />
+          <path d="M 200 92 A 68 68 0 0 1 200 228 A 26 68 0 0 0 200 92 Z" fill="${p.accentSoft}" class="anim-pulse-node" />
+          <path d="M 40 305 Q 120 245 200 305 T 360 305" fill="none" stroke="${p.accent1}" stroke-width="2" class="anim-dash-flow" />
+          <path d="M 40 322 Q 120 270 200 322 T 360 322" fill="none" stroke="${p.accent2}" stroke-width="1.4" stroke-opacity="0.7" class="anim-dash-flow" />
+        `;
+      }
+    }
+
+    /*************************************************************************
+     * 5. INTERACTIVE LAB WIDGETS (ANIMATED TAROT, SYNASTRY, LUNAR CYCLE)
+     *************************************************************************/
+    const TAROT_DECK = [
+      {
+        num: 'XVII • АРКАН',
+        title: 'Путеводная Звезда',
+        meaning: 'Ты на верной волне. Сомнения отступают — доверься своей главной мечте и сделай шаг сегодня.'
+      },
+      {
+        num: 'I • АРКАН',
+        title: 'Маг и Воля',
+        meaning: 'Все нужные ресурсы уже в твоих руках. Время переходить от размышлений к смелому действию.'
+      },
+      {
+        num: 'X • АРКАН',
+        title: 'Колесо Фортуны',
+        meaning: 'Неожиданный счастливый поворот. Будь открыт новым людям и предложениям в ближайшие 48 часов.'
+      },
+      {
+        num: 'XIX • АРКАН',
+        title: 'Чистое Солнце',
+        meaning: 'Период ясности, признания и притока жизненных сил. Позволь себе быть в центре внимания.'
+      },
+      {
+        num: 'II • АРКАН',
+        title: 'Верховная Жрица',
+        meaning: 'Ответ скрыт в тишине твоей интуиции. Не спеши раскрывать свои планы окружающим раньше времени.'
+      }
+    ];
+
+    let tarotIndex = 0;
+
+    function renderTarotFrontSVG(idx) {
+      const holder = document.getElementById('tarot-svg-holder');
+      if (!holder) return;
+      const p = PALETTES[activePaletteKey];
+
+      if (idx === 0) {
+        holder.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" fill="none">
+            <circle cx="50" cy="50" r="42" stroke="${p.accent1}" stroke-width="1" stroke-dasharray="3 3" class="anim-spin-cw"/>
+            <circle cx="50" cy="50" r="28" stroke="${p.accent2}" stroke-width="1" stroke-opacity="0.5" class="anim-spin-ccw"/>
+            <path d="M50 14 L56 42 L84 50 L56 58 L50 86 L44 58 L16 50 L44 42 Z" fill="${p.accentSoft}" class="anim-pulse-node"/>
+          </svg>
+        `;
+      } else if (idx === 1) {
+        holder.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" fill="none">
+            <polygon points="50,14 84,74 16,74" stroke="${p.accent1}" stroke-width="1.4" class="anim-spin-cw"/>
+            <polygon points="50,86 84,26 16,26" stroke="${p.accent2}" stroke-width="1.4" class="anim-spin-ccw"/>
+            <path d="M32 50 C32 38, 46 38, 50 50 C54 62, 68 62, 68 50 C68 38, 54 38, 50 50 C46 62, 32 62, 32 50 Z" stroke="#fff" stroke-width="2" class="anim-pulse-node"/>
+          </svg>
+        `;
+      } else if (idx === 2) {
+        holder.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" fill="none">
+            <g class="anim-spin-cw">
+              <circle cx="50" cy="50" r="40" stroke="${p.accent1}" stroke-width="1.6"/>
+              <line x1="50" y1="10" x2="50" y2="90" stroke="${p.accent1}" stroke-width="1.2"/>
+              <line x1="10" y1="50" x2="90" y2="50" stroke="${p.accent1}" stroke-width="1.2"/>
+              <line x1="22" y1="22" x2="78" y2="78" stroke="${p.accent2}" stroke-width="1.2"/>
+              <line x1="78" y1="22" x2="22" y2="78" stroke="${p.accent2}" stroke-width="1.2"/>
+            </g>
+            <circle cx="50" cy="50" r="10" fill="${p.accentSoft}" class="anim-pulse-node"/>
+          </svg>
+        `;
+      } else if (idx === 3) {
+        holder.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" fill="none">
+            <circle cx="50" cy="50" r="42" stroke="${p.accent1}" stroke-width="2" stroke-dasharray="4 5" class="anim-spin-cw"/>
+            <circle cx="50" cy="50" r="32" stroke="${p.accent2}" stroke-width="1.4" stroke-dasharray="6 4" class="anim-spin-ccw"/>
+            <circle cx="50" cy="50" r="18" fill="${p.accent1}" class="anim-pulse-node"/>
+          </svg>
+        `;
+      } else {
+        holder.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" fill="none">
+            <circle cx="50" cy="50" r="40" stroke="${p.accent2}" stroke-width="1.2" stroke-dasharray="3 4" class="anim-spin-ccw"/>
+            <path d="M56 20 A30 30 0 1 0 56 80 A22 28 0 1 1 56 20 Z" fill="${p.accentSoft}" class="anim-pulse-node"/>
+          </svg>
+        `;
+      }
+    }
+
+    function flipTarotCard() {
+      const card = document.getElementById('tarot-card-inner');
+      const hint = document.getElementById('tarot-status-hint');
+      if (card.classList.contains('is-flipped')) {
+        tarotIndex = (tarotIndex + 1) % TAROT_DECK.length;
+        const c = TAROT_DECK[tarotIndex];
+        card.classList.remove('is-flipped');
+        hint.textContent = 'Нажми на карту для переворота';
+        setTimeout(() => {
+          document.getElementById('tarot-num').textContent = c.num;
+          document.getElementById('tarot-title').textContent = c.title;
+          document.getElementById('tarot-meaning').textContent = c.meaning;
+          renderTarotFrontSVG(tarotIndex);
+        }, 280);
+      } else {
+        renderTarotFrontSVG(tarotIndex);
+        card.classList.add('is-flipped');
+        hint.textContent = 'Послание открыто • Нажми для новой карты';
+      }
+    }
+
+    function drawNewTarotCard(e) {
+      e.stopPropagation();
+      const card = document.getElementById('tarot-card-inner');
+      tarotIndex = (tarotIndex + 1) % TAROT_DECK.length;
+      const c = TAROT_DECK[tarotIndex];
+      card.classList.remove('is-flipped');
+      setTimeout(() => {
+        document.getElementById('tarot-num').textContent = c.num;
+        document.getElementById('tarot-title').textContent = c.title;
+        document.getElementById('tarot-meaning').textContent = c.meaning;
+        renderTarotFrontSVG(tarotIndex);
+        card.classList.add('is-flipped');
+      }, 300);
+    }
+
+    const SYNASTRY_MATRIX = {
+      'fire-air': { score: 96, text: 'Яркий творческий и страстный союз: Воздух раздувает пламя Огня, рождая общие идеи и мощное притяжение.' },
+      'fire-fire': { score: 89, text: 'Двойное пламя: взрывная страсть, высокая скорость жизни и взаимный драйв. Главное — давать друг другу пространство.' },
+      'fire-earth': { score: 78, text: 'Союз визии и результата: Огонь даёт импульс и масштаб, а Земля превращает смелые замыслы в прочный капитал.' },
+      'fire-water': { score: 82, text: 'Алхимия противоположностей: глубокая эмоциональная трансформация и магнетизм, который невозможно забыть.' },
+      'water-water': { score: 94, text: 'Полусловное понимание и глубокая душевная близость: вы чувствуете настроение друг друга на расстоянии.' },
+      'water-earth': { score: 95, text: 'Плодородный и надёжный союз: Вода наполняет отношения нежностью, а Земля создаёт безопасность и уют.' },
+      'water-air': { score: 80, text: 'Встреча интуиции и интеллекта: вы открываете друг другу совершенно новые грани восприятия мира.' },
+      'air-air': { score: 91, text: 'Лёгкость, свобода и бесконечные разговоры до утра: идеальное интеллектуальное и дружеское партнёрство.' },
+      'air-earth': { score: 79, text: 'Баланс идей и структуры: вместе вы способны реализовать проекты, которые одному казались невозможными.' },
+      'earth-earth': { score: 93, text: 'Фундаментальный союз доверия, верности и общих материальных целей. Отношения, которые с годами только крепнут.' }
+    };
+
+    function updateSynastryWidget() {
+      const e1 = document.getElementById('syn-elem-1').value;
+      const e2 = document.getElementById('syn-elem-2').value;
+      const key1 = `${e1}-${e2}`;
+      const key2 = `${e2}-${e1}`;
+      const data = SYNASTRY_MATRIX[key1] || SYNASTRY_MATRIX[key2] || SYNASTRY_MATRIX['fire-air'];
+
+      document.getElementById('syn-percent-badge').textContent = `${data.score}% Резонанс`;
+      document.getElementById('syn-verdict-box').textContent = data.text;
+
+      const svg = document.getElementById('synastry-mini-svg');
+      const p = PALETTES[activePaletteKey];
+      const offset = Math.round((100 - data.score) * 1.4);
+      const r1x = 122 - offset;
+      const r2x = 178 + offset;
+
+      svg.innerHTML = `
+        <g class="anim-spin-cw">
+          <circle cx="${r1x}" cy="90" r="56" fill="${p.accent1}" fill-opacity="0.12" stroke="${p.accent1}" stroke-width="1.6" stroke-dasharray="6 4" />
+          <circle cx="${r1x}" cy="34" r="4.5" fill="${p.accent1}" />
+        </g>
+        <g class="anim-spin-ccw">
+          <circle cx="${r2x}" cy="90" r="56" fill="${p.accent2}" fill-opacity="0.12" stroke="${p.accent2}" stroke-width="1.6" stroke-dasharray="6 4" />
+          <circle cx="${r2x}" cy="146" r="4.5" fill="${p.accent2}" />
+        </g>
+        <line x1="${r1x}" y1="90" x2="${r2x}" y2="90" stroke="${p.accentSoft}" stroke-opacity="0.6" stroke-dasharray="3 3" class="anim-dash-flow" />
+        <circle cx="150" cy="90" r="18" fill="${p.bgDeep}" stroke="${p.accent1}" stroke-width="1.4" class="anim-pulse-node" />
+        <text x="150" y="90" fill="#fff" font-size="10" font-family="JetBrains Mono" text-anchor="middle" dominant-baseline="central">${data.score}%</text>
+      `;
+    }
+
+    function updateMoonWidget(val) {
+      const num = parseInt(val, 10);
+      const svg = document.getElementById('interactive-moon-svg');
+      const p = PALETTES[activePaletteKey];
+      const label = document.getElementById('moon-phase-label');
+      const advice = document.getElementById('moon-advice-box');
+
+      let phaseName = '';
+      let text = '';
+      let illum = 0;
+
+      if (num < 15) {
+        phaseName = 'Новолуние';
+        illum = Math.round((num / 15) * 15);
+        text = 'Время тишины и посева намерений: запиши главные цели на месяц и не распыляй силы на суету.';
+      } else if (num < 45) {
+        phaseName = 'Растущая Луна';
+        illum = Math.round(((num - 15) / 30) * 70 + 15);
+        text = 'Фаза активного набора высоты: идеальное время для смелых запусков, важных встреч и проявления себя.';
+      } else if (num <= 58) {
+        phaseName = 'Полнолуние';
+        illum = 100;
+        text = 'Пик энергии и инсайтов: тайное становится явным, приходят яркие творческие озарения и ответы.';
+      } else {
+        phaseName = 'Убывающая Луна';
+        illum = Math.max(5, Math.round((1 - (num - 58) / 42) * 85));
+        text = 'Гармоничное завершение дел, очищение пространства и бережное наполнение внутреннего ресурса.';
+      }
+
+      label.textContent = `${phaseName} • ${illum}%`;
+      advice.textContent = text;
+
+      const rx = Math.abs(50 - num) * 1.1;
+      const sweep = num <= 50 ? 0 : 1;
+
+      svg.innerHTML = `
+        <circle cx="80" cy="80" r="68" fill="none" stroke="${p.accent1}" stroke-width="0.9" stroke-opacity="0.35" stroke-dasharray="3 4" class="anim-spin-cw"/>
+        <circle cx="80" cy="80" r="56" fill="#0B0F1D" stroke="${p.accent1}" stroke-opacity="0.45" stroke-width="1.2" />
+        <path d="M 80 24 A 56 56 0 0 1 80 136 A ${rx} 56 0 0 ${sweep} 80 24 Z" fill="${p.accentSoft}" opacity="0.9" class="anim-pulse-node" />
+        <circle cx="80" cy="80" r="62" fill="none" stroke="${p.accent2}" stroke-opacity="0.22" stroke-dasharray="3 5" class="anim-spin-ccw" />
+      `;
+    }
+
+    /*************************************************************************
+     * 6. EXPRESS PERSONAL CODE CALCULATOR (10-SECOND READING)
+     *************************************************************************/
+    const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII'];
+
+    const ARCANA_GIFTS = {
+      1: { title: 'Маг и Новатор', gift: 'Сила слова и инициативы' },
+      2: { title: 'Гармония и Интуиция', gift: 'Видение скрытых смыслов' },
+      3: { title: 'Императрица Изобилия', gift: 'Созидание и процветание' },
+      4: { title: 'Император Структуры', gift: 'Власть, порядок и масштаб' },
+      5: { title: 'Учитель Традиции', gift: 'Передача глубоких знаний' },
+      6: { title: 'Выбор Сердца', gift: 'Магнетизм и эстетика' },
+      7: { title: 'Колесница Победы', gift: 'Стремительный прорыв к цели' },
+      8: { title: 'Баланс и Закон', gift: 'Безупречное чувство правды' },
+      9: { title: 'Мудрец Глубины', gift: 'Самодостаточность и глубина' },
+      10: { title: 'Поток Фортуны', gift: 'Лёгкость и везение на виражах' },
+      11: { title: 'Сила и Страсть', gift: 'Огромный энергетический ресурс' },
+      12: { title: 'Новое Видение', gift: 'Нестандартный взгляд и эмпатия' },
+      13: { title: 'Трансформация', gift: 'Смелость обновлять жизнь' },
+      14: { title: 'Алхимия Души', gift: 'Творческое исцеление и мера' },
+      15: { title: 'Магнетизм и Харизма', gift: 'Влияние и большие финансы' },
+      16: { title: 'Пробуждение Духа', gift: 'Строительство нового на века' },
+      17: { title: 'Путеводная Звезда', gift: 'Яркий талант и вдохновение' },
+      18: { title: 'Магия Луны', gift: 'Сила притяжения и образов' },
+      19: { title: 'Солнце и Масштаб', gift: 'Притяжение и Лидерство' },
+      20: { title: 'Голос Рода', gift: 'Пробуждение и яснознание' },
+      21: { title: 'Мир без Границ', gift: 'Глобальные проекты и свобода' },
+      22: { title: 'Чистая Свобода', gift: 'Творческий полёт без рамок' }
+    };
+
+    function reduceArcana(n) {
+      let v = Math.abs(n);
+      while (v > 22) {
+        v = String(v).split('').reduce((a, b) => a + parseInt(b, 10), 0);
+      }
+      return v === 0 ? 22 : v;
+    }
+
+    function getZodiacSign(month, day) {
+      const signs = [
+        { name: 'Козерог • Земля', glyph: '♑', max: [1, 19] },
+        { name: 'Водолей • Воздух', glyph: '♒', max: [2, 18] },
+        { name: 'Рыбы • Вода', glyph: '♓', max: [3, 20] },
+        { name: 'Овен • Огонь', glyph: '♈', max: [4, 19] },
+        { name: 'Телец • Земля', glyph: '♉', max: [5, 20] },
+        { name: 'Близнецы • Воздух', glyph: '♊', max: [6, 20] },
+        { name: 'Рак • Вода', glyph: '♋', max: [7, 22] },
+        { name: 'Лев • Огонь', glyph: '♌', max: [8, 22] },
+        { name: 'Дева • Земля', glyph: '♍', max: [9, 22] },
+        { name: 'Весы • Воздух', glyph: '♎', max: [10, 22] },
+        { name: 'Скорпион • Вода', glyph: '♏', max: [11, 21] },
+        { name: 'Стрелец • Огонь', glyph: '♐', max: [12, 21] },
+        { name: 'Козерог • Земля', glyph: '♑', max: [12, 31] }
+      ];
+      for (const s of signs) {
+        if (month < s.max[0] || (month === s.max[0] && day <= s.max[1])) return s;
+      }
+      return signs[0];
+    }
+
+    function calculateExpressCode(e) {
+      if (e) e.preventDefault();
+      const name = (document.getElementById('exp-name').value || 'Искатель').trim();
+      const dateStr = document.getElementById('exp-date').value || '1996-08-19';
+      const [y, m, d] = dateStr.split('-').map(Number);
+
+      const sign = getZodiacSign(m, d);
+      const arcana = reduceArcana(reduceArcana(d) + reduceArcana(m) + reduceArcana(y));
+      const info = ARCANA_GIFTS[arcana] || ARCANA_GIFTS[19];
+
+      document.getElementById('exp-sun-glyph').textContent = sign.glyph;
+      document.getElementById('exp-sun-title').textContent = sign.name;
+      document.getElementById('exp-arcana-num').textContent = ROMAN[arcana];
+      document.getElementById('exp-arcana-title').textContent = info.title;
+      document.getElementById('exp-gift-title').textContent = info.gift;
+
+      document.getElementById('exp-summary-text').innerHTML = `
+        <strong class="text-white font-medium">${name}</strong>, твоя ведущая частота объединяет знак <strong class="text-white">${sign.name}</strong> и центральный <strong class="text-white">${ROMAN[arcana]} Аркан (${info.title})</strong>. Твоя главная точка роста — ${info.gift.toLowerCase()}, доверие к своей интуиции и смелая реализация личного масштаба.
+      `;
+
+      flight.scrollBoost = 9;
+    }
+
+    /*************************************************************************
+     * 7. INTERSECTION OBSERVER FOR SCROLL-MORPHING & STEP DETECTION
+     *************************************************************************/
+    function initScrollMorphObserver() {
+      const morphObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      }, { threshold: 0.22, rootMargin: '0px 0px -12% 0px' });
+
+      document.querySelectorAll('.scroll-morph').forEach(el => morphObserver.observe(el));
+    }
+
+    /*************************************************************************
+     * 8. UI MODALS & MOBILE MENU HELPERS
+     *************************************************************************/
+    function toggleMobileNav() {
+      document.getElementById('mobile-nav').classList.toggle('hidden');
+    }
+
+    function openActionModal(planTitle) {
+      document.getElementById('modal-plan-title').textContent = planTitle || 'Открыть полный доступ';
+      document.getElementById('modal-form').classList.remove('hidden');
+      document.getElementById('modal-success').classList.add('hidden');
+      const m = document.getElementById('action-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeActionModal() {
+      const m = document.getElementById('action-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitActionModal(e) {
+      e.preventDefault();
+      document.getElementById('modal-form').classList.add('hidden');
+      document.getElementById('modal-success').classList.remove('hidden');
+    }
+
+    // Initialize Application on Load
+    window.onload = function () {
+      resizeCosmosCanvas();
+      init3DUniverse();
+      requestAnimationFrame(renderCosmosLoop);
+
+      renderHeroGyroscope();
+      renderTarotFrontSVG(0);
+      activateEcoStep(0);
+      updateSynastryWidget();
+      updateMoonWidget(36);
+      initScrollMorphObserver();
+      updatePinnedEcosystemOnScroll();
+
+      window.addEventListener('resize', () => {
+        resizeCosmosCanvas();
+        updatePinnedEcosystemOnScroll();
+      });
+    };
+
+    // Expose handlers explicitly on window for inline HTML attributes
+    window.setCosmicPalette = setCosmicPalette;
+    window.updateFlightSpeedFromSlider = updateFlightSpeedFromSlider;
+    window.updateGalaxyZoomFromSlider = updateGalaxyZoomFromSlider;
+    window.updateGalaxyXFromSlider = updateGalaxyXFromSlider;
+    window.updateGalaxyYFromSlider = updateGalaxyYFromSlider;
+    window.toggleOrbitLock = toggleOrbitLock;
+    window.selectCosmicTarget = selectCosmicTarget;
+    window.togglePureSpace = togglePureSpace;
+    window.cycleHeroOrbMode = cycleHeroOrbMode;
+    window.scrollToEcoStep = scrollToEcoStep;
+    window.flipTarotCard = flipTarotCard;
+    window.drawNewTarotCard = drawNewTarotCard;
+    window.updateSynastryWidget = updateSynastryWidget;
+    window.updateMoonWidget = updateMoonWidget;
+    window.calculateExpressCode = calculateExpressCode;
+    window.toggleMobileNav = toggleMobileNav;
+    window.openActionModal = openActionModal;
+    window.closeActionModal = closeActionModal;
+    window.submitActionModal = submitActionModal;
+  </script>
+</body>
+</html>
