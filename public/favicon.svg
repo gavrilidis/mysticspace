@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <style>
+    @keyframes spinCW {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinCCW {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes pulseStar {
+      0%, 100% { transform: scale(0.88); opacity: 0.8; }
+      50% { transform: scale(1.14); opacity: 1; }
+    }
+    .cw {
+      transform-origin: 32px 32px;
+      animation: spinCW 10s linear infinite;
+    }
+    .ccw {
+      transform-origin: 32px 32px;
+      animation: spinCCW 12s linear infinite;
+    }
+    .star {
+      transform-origin: 32px 32px;
+      animation: pulseStar 2.6s ease-in-out infinite;
+    }
+  </style>
+  <circle cx="32" cy="32" r="30" fill="#030408" stroke="#E5C158" stroke-width="2" stroke-opacity="0.45"/>
+  <circle cx="32" cy="32" r="24" stroke="#E5C158" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="4 4" class="cw"/>
+  <g class="ccw">
+    <ellipse cx="32" cy="32" rx="22" ry="9.5" transform="rotate(-30 32 32)" stroke="#E5C158" stroke-width="2"/>
+    <circle cx="51" cy="25" r="2.8" fill="#E5C158"/>
+  </g>
+  <g class="cw">
+    <ellipse cx="32" cy="32" rx="22" ry="9.5" transform="rotate(40 32 32)" stroke="#60A5FA" stroke-width="1.6" stroke-opacity="0.8"/>
+  </g>
+  <path d="M32 20 L34.6 29.4 L44 32 L34.6 34.6 L32 44 L29.4 34.6 L20 32 L29.4 29.4 Z" fill="#F5E6C8" class="star"/>
+</svg>
+

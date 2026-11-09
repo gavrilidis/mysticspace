@@ -1,12 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCosmic } from '@/context/CosmicContext';
 
 export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { isAudioMuted, isAudioPlaying, toggleAudioMute } = useCosmic();
 
   const toggleMobileNav = () => setMobileNavOpen((prev) => !prev);
   const closeMobileNav = () => setMobileNavOpen(false);
+
+  const isSoundActive = isAudioPlaying && !isAudioMuted;
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#030408]/65 backdrop-blur-2xl">
@@ -82,8 +86,55 @@ export default function Header() {
           </a>
         </nav>
 
-        {/* Right CTA & Mobile Menu Button */}
+        {/* Right Audio Mute Button, CTA & Mobile Menu Button */}
         <div className="flex items-center gap-2.5">
+          {/* Cosmic Music Mute / Unmute Button */}
+          <button
+            type="button"
+            data-audio-toggle="true"
+            onClick={toggleAudioMute}
+            aria-label={isSoundActive ? 'Выключить музыку' : 'Включить музыку'}
+            title={isSoundActive ? 'Выключить музыку' : 'Включить космическую музыку'}
+            className={`px-3.5 py-2.5 rounded-full text-xs font-mono uppercase tracking-wider flex items-center gap-2 transition-all border ${
+              isSoundActive
+                ? 'border-accent bg-white/10 text-accent-1 shadow-[0_0_18px_rgba(var(--accent-1-rgb),0.22)]'
+                : 'border-white/15 bg-white/5 text-slate-400 hover:text-white hover:border-white/35'
+            }`}
+          >
+            {isSoundActive ? (
+              <>
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                    d="M11 5L6 9H2v6h4l5 4V5z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                    d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
+                    className=" animate-pulse"
+                  />
+                </svg>
+                <span className="hidden md:inline text-[10px]">Звук Вкл</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                    d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+                  />
+                </svg>
+                <span className="hidden md:inline text-[10px]">Muted</span>
+              </>
+            )}
+          </button>
+
           <a
             href="#express-code"
             className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase btn-cosmic"
@@ -158,4 +209,3 @@ export default function Header() {
     </header>
   );
 }
-

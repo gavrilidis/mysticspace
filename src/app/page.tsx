@@ -3,6 +3,7 @@
 import React from 'react';
 import CosmosCanvas from '@/components/canvas/CosmosCanvas';
 import FlightControllerHud from '@/components/hud/FlightControllerHud';
+import AnimatedFavicon from '@/components/layout/AnimatedFavicon';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import ActionModal from '@/components/modals/ActionModal';
@@ -18,6 +19,8 @@ export default function HomePage() {
 
   return (
     <>
+      <AnimatedFavicon />
+
       {/* 1. 3D Galaxy & Deep Space Engine */}
       <CosmosCanvas />
 

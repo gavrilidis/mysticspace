@@ -47,3 +47,4 @@ try {
   console.error('\n✕ Ошибка при деплое:', error.message);
   process.exit(1);
 }
+

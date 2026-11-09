@@ -20,12 +20,12 @@ export default function HeroGyroscope() {
   return (
     <div
       id="hero-orb-wrapper"
-      className="relative w-full max-w-[420px] aspect-square flex items-center justify-center select-none cursor-pointer group"
+      className="relative w-full max-w-[420px] aspect-square flex items-center justify-center select-none cursor-pointer group mx-auto"
       onClick={handleCycleMode}
     >
       {/* Outer Ambient Aura */}
       <div
-        className="absolute inset-6 rounded-full blur-3xl opacity-35 transition-all duration-700 group-hover:opacity-55"
+        className="absolute inset-6 rounded-full blur-3xl opacity-35 transition-all duration-700 group-hover:opacity-55 pointer-events-none"
         style={{
           background:
             'radial-gradient(circle, var(--accent-1) 0%, var(--accent-2) 60%, transparent 100%)',
@@ -36,7 +36,7 @@ export default function HeroGyroscope() {
       <svg
         id="hero-gyro-svg"
         viewBox="0 0 500 500"
-        className="w-full h-full overflow-visible transition-transform duration-300 ease-out"
+        className="w-full h-full overflow-visible transition-transform duration-300 ease-out block"
       >
         <defs>
           <radialGradient id="orbCoreGrad" cx="50%" cy="50%" r="50%">
@@ -68,7 +68,15 @@ export default function HeroGyroscope() {
           className="anim-spin-ccw"
         />
 
-        <g className="anim-spin-cw">
+        <g>
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 250 250"
+            to="360 250 250"
+            dur="36s"
+            repeatCount="indefinite"
+          />
           <ellipse
             cx={cx}
             cy={cy}
@@ -112,7 +120,15 @@ export default function HeroGyroscope() {
           })}
         </g>
 
-        <g className="anim-spin-ccw">
+        <g>
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="360 250 250"
+            to="0 250 250"
+            dur="24s"
+            repeatCount="indefinite"
+          />
           {Array.from({ length: 8 }).map((_, i) => {
             const a1 = (i * 45 * Math.PI) / 180;
             const a2 = (((i + 3) * 45) * Math.PI) / 180;
@@ -156,11 +172,10 @@ export default function HeroGyroscope() {
       </svg>
 
       {/* Floating Interactive Badge */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 mystic-card rounded-full px-4 py-1.5 text-[11px] font-mono text-accent-soft flex items-center gap-2 shadow-lg whitespace-nowrap">
-        <span className="w-1.5 h-1.5 rounded-full bg-current text-accent-1 animate-ping" />
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 mystic-card rounded-full px-4 py-1.5 text-[11px] font-mono text-accent-soft flex items-center justify-center gap-2 shadow-lg whitespace-nowrap">
+        <span className="w-1.5 h-1.5 rounded-full bg-current text-accent-1 animate-ping shrink-0" />
         <span id="hero-orb-caption">{HERO_ORB_CAPTIONS[orbMode]}</span>
       </div>
     </div>
   );
 }
-

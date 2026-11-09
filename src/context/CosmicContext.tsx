@@ -4,6 +4,9 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { COSMIC_TARGETS, PALETTES } from '@/data/palettes';
 import { CosmicPalette, FlightTelemetry, PaletteKey } from '@/types/mystic';
 
+const COSMIC_AUDIO_URL =
+  'https://res.cloudinary.com/dyy5bkrsv/video/upload/v1772494581/Cosmic_Flower_ur3cwp.mp3';
+
 interface CosmicContextValue {
   paletteKey: PaletteKey;
   palette: CosmicPalette;
@@ -30,6 +33,9 @@ interface CosmicContextValue {
   closeActionModal: () => void;
   submitActionModal: () => void;
   geometryVersion: number;
+  isAudioMuted: boolean;
+  isAudioPlaying: boolean;
+  toggleAudioMute: () => void;
 }
 
 const CosmicContext = createContext<CosmicContextValue | null>(null);
@@ -47,6 +53,11 @@ export function CosmicProvider({ children }: { children: React.ReactNode }) {
 
   const [modalPlanTitle, setModalPlanTitle] = useState<string | null>(null);
   const [modalSubmitted, setModalSubmitted] = useState<boolean>(false);
+
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const userExplicitlyMutedRef = useRef<boolean>(false);
 
   const flightRef = useRef<FlightTelemetry>({
     width: 1440,
@@ -71,6 +82,89 @@ export function CosmicProvider({ children }: { children: React.ReactNode }) {
     focalLength: 520,
     maxDepth: 2200,
   });
+
+  // Background Cosmic Audio Autoplay + First Interaction Unlock
+  useEffect(() => {
+    const audio = new Audio(COSMIC_AUDIO_URL);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.volume = 0.55;
+    audioRef.current = audio;
+
+    const tryAutoplay = () => {
+      if (userExplicitlyMutedRef.current) return;
+      audio
+        .play()
+        .then(() => {
+          setIsAudioPlaying(true);
+          setIsAudioMuted(false);
+          cleanupListeners();
+        })
+        .catch(() => {
+          // Autoplay blocked until user interacts with page
+        });
+    };
+
+    const handleFirstInteraction = (e: Event) => {
+      // Ignore if clicking directly on the mute toggle button so it doesn't double-toggle
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest('[data-audio-toggle="true"]')) {
+        cleanupListeners();
+        return;
+      }
+      tryAutoplay();
+    };
+
+    const events: (keyof WindowEventMap)[] = [
+      'pointerdown',
+      'click',
+      'touchstart',
+      'keydown',
+    ];
+
+    const cleanupListeners = () => {
+      events.forEach((evt) =>
+        window.removeEventListener(evt, handleFirstInteraction, { capture: true })
+      );
+    };
+
+    events.forEach((evt) =>
+      window.addEventListener(evt, handleFirstInteraction, { capture: true, passive: true })
+    );
+
+    tryAutoplay();
+
+    return () => {
+      cleanupListeners();
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  const toggleAudioMute = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isAudioPlaying && !isAudioMuted) {
+      userExplicitlyMutedRef.current = true;
+      audio.muted = true;
+      audio.pause();
+      setIsAudioMuted(true);
+      setIsAudioPlaying(false);
+    } else {
+      userExplicitlyMutedRef.current = false;
+      audio.muted = false;
+      audio
+        .play()
+        .then(() => {
+          setIsAudioMuted(false);
+          setIsAudioPlaying(true);
+        })
+        .catch(() => {
+          setIsAudioMuted(false);
+        });
+    }
+  }, [isAudioMuted, isAudioPlaying]);
 
   const applyPaletteCssVars = useCallback((p: CosmicPalette) => {
     if (typeof document === 'undefined') return;
@@ -129,7 +223,8 @@ export function CosmicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const selectCosmicTarget = useCallback((idx: number) => {
-    const safeIdx = ((idx % COSMIC_TARGETS.length) + COSMIC_TARGETS.length) % COSMIC_TARGETS.length;
+    const safeIdx =
+      ((idx % COSMIC_TARGETS.length) + COSMIC_TARGETS.length) % COSMIC_TARGETS.length;
     flightRef.current.targetIndex = safeIdx;
     flightRef.current.state = 'APPROACH';
     flightRef.current.galaxyDist = 640;
@@ -203,6 +298,9 @@ export function CosmicProvider({ children }: { children: React.ReactNode }) {
     closeActionModal,
     submitActionModal,
     geometryVersion,
+    isAudioMuted,
+    isAudioPlaying,
+    toggleAudioMute,
   };
 
   return <CosmicContext.Provider value={value}>{children}</CosmicContext.Provider>;
@@ -215,4 +313,3 @@ export function useCosmic(): CosmicContextValue {
   }
   return ctx;
 }
-

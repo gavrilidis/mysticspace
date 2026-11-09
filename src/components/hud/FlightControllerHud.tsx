@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useCosmic } from '@/context/CosmicContext';
 import { COSMIC_TARGETS, MYSTIC_REALM_NAMES, PALETTE_OPTIONS } from '@/data/palettes';
 
 export default function FlightControllerHud() {
+  const [isOpen, setIsOpen] = useState(true);
+
   const {
     paletteKey,
     setCosmicPalette,
@@ -39,10 +41,37 @@ export default function FlightControllerHud() {
           ? 'Поток'
           : 'Вихрь';
 
+  if (!isOpen) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50 pointer-events-auto flex items-center gap-2">
+        {pureSpace && (
+          <button
+            type="button"
+            onClick={togglePureSpace}
+            className="mystic-card px-4 py-2.5 rounded-full text-xs font-mono text-white border border-accent shadow-2xl backdrop-blur-2xl hover:bg-white/15 transition-all flex items-center gap-1.5"
+          >
+            <span>✦</span>
+            <span>Вернуть меню</span>
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="mystic-card px-4 py-2.5 rounded-full text-xs font-mono text-accent-soft border border-accent shadow-2xl backdrop-blur-2xl hover:text-white transition-all flex items-center gap-2"
+          aria-label="Показать инструменты управления космосом"
+        >
+          <span className="w-2 h-2 rounded-full bg-current text-accent-1 animate-ping shrink-0" />
+          <span>Инструменты космоса</span>
+          <span className="text-accent-1">▴</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-5 sm:right-5 z-50 pointer-events-auto max-w-md sm:w-[390px] ml-auto">
+    <div className="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-5 sm:right-5 z-50 pointer-events-auto max-w-md sm:w-[400px] ml-auto">
       <div className="mystic-card rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-accent backdrop-blur-2xl space-y-2.5">
-        {/* Top Row: Mystical Flight Controls */}
+        {/* Top Row: Mystical Flight Controls + Collapse Button */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-current text-accent-1 animate-ping shrink-0" />
@@ -55,6 +84,7 @@ export default function FlightControllerHud() {
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <button
+              type="button"
               onClick={toggleOrbitLock}
               id="orbit-lock-btn"
               className={
@@ -67,12 +97,22 @@ export default function FlightControllerHud() {
               {lockOrbit ? '⟳ Кружение' : '⟳ Свободно'}
             </button>
             <button
+              type="button"
               onClick={togglePureSpace}
               id="pure-space-btn"
-              className="px-2.5 py-0.5 rounded-md text-[10px] font-mono border border-accent bg-white/5 text-white hover:bg-white/15 transition-all flex items-center gap-1"
+              className="px-2 py-0.5 rounded-md text-[10px] font-mono border border-accent bg-white/5 text-white hover:bg-white/15 transition-all flex items-center gap-1"
             >
               <span>✦</span>
-              <span id="pure-space-label">{pureSpace ? 'Вернуть меню' : 'Чистое небо'}</span>
+              <span id="pure-space-label">{pureSpace ? 'Меню' : 'Небо'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/15 bg-white/5 text-slate-300 hover:text-white hover:bg-white/15 transition-all"
+              title="Скрыть панель инструментов"
+              aria-label="Скрыть панель инструментов"
+            >
+              ▾ Скрыть
             </button>
           </div>
         </div>
@@ -89,7 +129,7 @@ export default function FlightControllerHud() {
             max="5"
             step="0.05"
             value={sliderSpeed}
-            onChange={(e) => setSliderSpeed( parseFloat(e.target.value) )}
+            onChange={(e) => setSliderSpeed(parseFloat(e.target.value))}
             className="cosmic-slider flex-1"
             aria-label="Регулятор скорости движения в космосе"
           />
@@ -183,6 +223,7 @@ export default function FlightControllerHud() {
               const isSelected = paletteKey === opt.key;
               return (
                 <button
+                  type="button"
                   key={opt.key}
                   onClick={() => setCosmicPalette(opt.key)}
                   id={`pal-${opt.key}`}
@@ -209,6 +250,7 @@ export default function FlightControllerHud() {
             const isSelected = targetIndex === idx;
             return (
               <button
+                type="button"
                 key={target.id}
                 onClick={() => selectCosmicTarget(idx)}
                 id={`target-pill-${idx}`}
@@ -227,4 +269,3 @@ export default function FlightControllerHud() {
     </div>
   );
 }
-
